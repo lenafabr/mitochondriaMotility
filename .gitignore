@@ -1,0 +1,12 @@
+*.aux
+*.asv
+*~
+*.toc
+*.nav
+*.out
+*.snm
+*.synctex.gz
+*.log
+*\#
+.\#*
+*.mat
