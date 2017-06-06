@@ -198,8 +198,8 @@ for step = 1:opt.nstep
        
     % decide which mitochondria start after this step   
     u = rand(length(stopind),1);
-    ind = find(u<=pstart);
-    mitostate(ind) = (rand(length(ind),1)<=0.5)*2 - 1; % start in random direction
+    restartind = find(u<=pstart);
+    mitostate(stopind(restartind)) = (rand(length(restartind),1)<=0.5)*2 - 1; % start in random direction
     
     if (opt.dodisplay & mod(step,opt.showevery)==0)
         % plot glucose concentration
