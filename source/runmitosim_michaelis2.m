@@ -36,6 +36,9 @@ opt.Km = 1;
 % default is to start linear
 opt.startgluc = [];
 
+% fix permanent glucose distribution; do not evolve it
+opt.fixgluc = [];
+
 opt.nmito = 1; % number of mitochondria
 opt.gpts = 100; % number of discrete spatial points for evaluating gluc concentration
 opt.delt = 1e-4; % time-step
@@ -80,6 +83,7 @@ Kmh = opt.Km/opt.c0;
 
 % spatial resolution
 dx = Lh/(opt.gpts - 1);
+
 %%
 % initialize variables
 
@@ -121,6 +125,11 @@ if (opt.restart)
     mitostate = ((u<=0.5)*2-1).*mitostate;
 end
 
+if (~isempty(opt.fixgluc))
+    if (length(opt.fixgluc) ~= length(xpos)); error('wrong length of fixgluc'); end
+    gluc = opt.fixgluc;
+end
+
 mitopos0 = mitopos;
 %% evolve the system over time
 d2g = zeros(opt.gpts,1);
@@ -137,6 +146,7 @@ for step = 1:opt.nstep
         error('bad mito positions')
     end
     
+    if (isempty(opt.fixgluc))
     % ---------
     % evolve forward the glucose concentration by 1 time step
     % ----------
@@ -170,6 +180,7 @@ for step = 1:opt.nstep
     if (any(gluc<-1e-3))
         error('negative concentrations!')
     end    
+    end
     
     % move the walking mitochondria
     walkind = find(mitostate);
