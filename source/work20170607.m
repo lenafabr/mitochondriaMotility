@@ -11,7 +11,7 @@ options.kg = 0.2*10;
 options.Km = 0.1/c0;
 %options.startpos = 50;
 options.pstartwalk = 1;
-options.nstep = 1e5;
+options.nstep = 1e6;
 
 options.showevery = 100;
 
@@ -22,7 +22,7 @@ options.delt=5e-2;
 %
 %options.startgluc = gluc;
 %options.startgluc(end) = 0.1;
-options.fixgluc = gluc;
+%options.fixgluc = gluc;
 
 [gluc,mitopos,mitostate,opt] = runmitosim_michaelis2(options)
 xpos = linspace(0,500,opt.gpts)';
