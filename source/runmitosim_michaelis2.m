@@ -226,7 +226,8 @@ for step = 1:opt.nstep
                 %plot([mitopos(mc) mitopos(mc)], [ymin,ymax],'LineWidth',2,'Color',[0,0.5,0])
                  plot([mitopos(mc)], [0.5],'o','Color',[0,0.5,0],'LineWidth',2)
             end
-            title(sprintf('Step %d',step))
+            mval = (var(mitopos)-opt.L^2/12)/(opt.L^2/6);
+            title(sprintf('Step %d: variance metric = %0.3f',step,mval))
         end
         hold off
         %ylim([0,opt.c0*1.5])
