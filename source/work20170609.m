@@ -21,8 +21,8 @@ end
 
 pcolor(log10(Alist),log10(lhlist),varmetric)
 shading flat
-xlabel('A*lh')
-ylabel('lh = sqrt(D/(kg*N*del*L))')
+%xlabel('A*lh')
+%ylabel('lh = sqrt(D/(kg*N*del*L))')
 title('variance metric')
 
 %%
@@ -33,7 +33,7 @@ lh = sqrt(D/(kg*N*del*L))
 
 %%
 hold all
-plot(log10(Alist),log10(lh/sqrt(10))*ones(size(Alist)),'k')
+plot(log10(Alist),log10(lh)*ones(size(Alist)),'k','LineWidth',2)
 hold off
 
 %% for a given value of A, plot versus lh
@@ -46,14 +46,15 @@ for ac = 1:length(Alist)
         lh = lhlist(lc);
         varmetric(lc,ac) = varfunc(lh,A*lh);
     end
-    semilogx(lhlist,varmetric(:,ac))
+    semilogx(lhlist,varmetric(:,ac),'LineWidth',2)
     hold all
 end
 hold off
 
-xlabel('lh')
-ylabel('variance metric')
+%xlabel('lh')
+%ylabel('variance metric')
 legend('A=1','A=10','A=100')
+set(gca,'FontSize',14)
 
 %% for a given value of lh, plot vs A
 Alist = logspace(-2,2);;
@@ -72,3 +73,6 @@ hold off
 xlabel('A')
 ylabel('variance metric')
 legend(strlabel)
+
+%% sim data from Anamika
+load('results/workspace_6_12_50itr_10fold.mat')

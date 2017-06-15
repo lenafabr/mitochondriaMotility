@@ -7,11 +7,11 @@ c0 = 0.4
 
 options.L = 500;
 options.D = 140;
-options.kg = 0.2*10;
+options.kg = 0.2;
 options.Km = 0.1/c0;
 %options.startpos = 50;
 options.pstartwalk = 1;
-options.nstep = 1e6;
+options.nstep = 1e4;
 
 options.showevery = 100;
 
@@ -27,6 +27,12 @@ options.delt=5e-2;
 [gluc,mitopos,mitostate,opt] = runmitosim_michaelis2(options)
 xpos = linspace(0,500,opt.gpts)';
 
+%% upper limit based on fixed glucose profile, linear kinetics
+
+lh = sqrt(options.D/(options.kg*options.L*options.nmito))
+A = options.ks/options.kw
+varfunc  = @(lh,Al) 2*Al*(-6*lh + (1+12*lh^2)*tanh(1/2/lh)) / (1+2*Al*tanh(1/2/lh));
+varfunc(lh,A*lh)
 %%
 save('~/grants/NSFcareer/workfig/mitochondriasim.mat')
 %% variance metric
