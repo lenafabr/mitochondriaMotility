@@ -1,4 +1,4 @@
-function [gluc,Tmito,normdtg,gluc_init,xpos,opt] = runiterativesims(options)
+function [gluc,Tmito,normdtg,gluc_init,opt,lmdh] = runiterativesims(options)
 %% set up default simulation parameters
 opt = struct();
 
@@ -23,7 +23,7 @@ opt.gpts = 100; % number of discrete spatial points for evaluating gluc concentr
 opt.delt = 1e-4; % time-step
 opt.nstep = 1000; % number of steps to run
 
-opt.f = opt.nmito * opt.msize / opt.L;
+
 
 % boundary conditions on the far size
 % positive = fixed concentration at the boundary
@@ -50,6 +50,8 @@ opt.restart = 1; % flag to enable continuing previous sims
 if (exist('options')==1)
     opt = copyStruct(options, opt);
 end
+
+opt.f = opt.nmito * opt.msize / opt.L;
 
 % set up dimensionless parameters
 
@@ -89,8 +91,9 @@ dtg = zeros(opt.gpts,1);
 normdtg = inf;
 
 dtcutoff = opt.dttol*(kgh*Kmh/(Kmh+1));
+spacing = Lh/opt.gpts; %integration spacing
 
-initglucint = trapz(gluc_init);
+initglucint = spacing * trapz(gluc_init);
 
 %% Iterative process
 %continues till steady state
@@ -100,7 +103,7 @@ while (normdtg > dtcutoff)
     
     %Calculate distribution of total number of mitochondria
     ksx = ksh * Kmh * gluc ./ (Kmh + gluc);
-    ksx_int = trapz(ksx);
+    ksx_int = spacing * trapz(ksx);
     Tmito = (ksx/kwh + 1) ./ (Lh + (ksx_int/kwh));
     
     %Calculate the change in glucose concentration
@@ -127,4 +130,3 @@ while (normdtg > dtcutoff)
         drawnow
     end
 end
-
