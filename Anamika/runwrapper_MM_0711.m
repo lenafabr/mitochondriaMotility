@@ -42,7 +42,7 @@ for i = 1:1:nitr
     end
 end
 
-
+%%
 % plot(xpos,gluc_init,'k--')
 % hold all
 % plot(xpos,gluc,'b.-')

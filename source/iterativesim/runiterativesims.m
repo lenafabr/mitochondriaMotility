@@ -1,4 +1,4 @@
-function [gluc,Tmito,normdtg,gluc_init,opt] = runiterativesims(options)
+function [gluc,Tmito,normdtg,gluc_init,xpos,opt] = runiterativesims(options)
 %% set up default simulation parameters
 opt = struct();
 
