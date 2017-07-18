@@ -1,4 +1,6 @@
 %run wrapper for runiterativesims function - with changing parameters
+%change Al and l logarithmically
+
 %define options structure
 
 options = struct();
@@ -26,17 +28,23 @@ options.showevery=1;
 
 
 %run the function
-%change ks at every iteration, thereby changing A 
-%Also change A* Lambda hat in every iteration, and thus calculate opt.kg
-for i = 1:1:200
-    options.ks = 0.01*i
-    A_var(i) = options.ks * options.c0/options.kw;
+%change lambda hat in every iteration, calculate options.kg 
+%Also change A* Lambda hat in every iteration, and thus calculate
+%options.ks
+nl = 200;
+nAl = 201;
+l_lim = 3; %lambda's absolute limit
+Al_lim = 2; %Al's absolute limit
+for i = 1:1:nl
+    log_lambda_hat = -l_lim + (2*l_lim/nl) * i;
+    lambda_hat(i) = 10 .^ (log_lambda_hat);
     for j = 1:1:201
-        Al(j) = 0.1*j;
-        lmdh = Al(j) ./ A_var(i);
-        options.kg = options.D ./ (options.nmito * options.msize * options.L * (lmdh^2));
+        log_Al = -Al_lim + (2*Al_lim/nAl) * j;
+        Al(j) = 10 .^ (log_Al);
+        A = Al(j) ./ lambda_hat(i);
+        options.kg = options.D ./ (options.nmito * options.msize * options.L * (lambda_hat(i)^2));
+        options.ks = A * options.kw ./ options.c0;
         [gluc,Tmito,normdtg,gluc_init,opt,xpos,lmdh] = runiterativesims(options);
         var_metric(i,j) = var(xpos,Tmito) ; %variance in mitochondria position distribution;
     end
 end
-
