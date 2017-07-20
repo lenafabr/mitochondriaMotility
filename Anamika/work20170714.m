@@ -13,7 +13,7 @@ options.D = 140;
 options.pstartwalk = 1;
 options.nstep = 1e4;
 options.restart = 1;
-options.km = 20;
+options.km = 30;
 options.c0 = 0.1;
 
 %options.ks = (1/4.8*1e-6)*c0*(10^-3*6e23/1000/1e12*4^2);
@@ -29,10 +29,12 @@ options.showevery=1;
 %change ks at every iteration, thereby changing A 
 %Also change A* Lambda hat in every iteration, and thus calculate opt.kg
 for i = 1:1:200
-    options.ks = 0.01*i
+    log_ks = -3 + (6*i/200);
+    options.ks = 10.^(log_ks);
     A_var(i) = options.ks * options.c0/options.kw;
     for j = 1:1:201
-        Al(j) = 0.1*j;
+        log_Al = -2 + (4*j/201);
+        Al(j) = 10 .^ log_Al;
         lmdh = Al(j) ./ A_var(i);
         options.kg = options.D ./ (options.nmito * options.msize * options.L * (lmdh^2));
         [gluc,Tmito,normdtg,gluc_init,opt,xpos,lmdh] = runiterativesims(options);

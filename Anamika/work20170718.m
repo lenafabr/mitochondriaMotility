@@ -16,7 +16,7 @@ options.pstartwalk = 1;
 options.nstep = 1e4;
 options.restart = 1;
 options.km = 20;
-options.c0 = 0.1;
+options.c0 = 1;
 
 %options.ks = (1/4.8*1e-6)*c0*(10^-3*6e23/1000/1e12*4^2);
 options.kw = 1 * 0.01;
@@ -36,7 +36,7 @@ nAl = 201;
 l_lim = 3; %lambda's absolute limit
 Al_lim = 2; %Al's absolute limit
 for i = 1:1:nl
-    log_lambda_hat = -l_lim + (2*l_lim/nl) * i;
+    log_lambda_hat = l_lim - (2*l_lim/nl) * (i-1);
     lambda_hat(i) = 10 .^ (log_lambda_hat);
     for j = 1:1:201
         log_Al = -Al_lim + (2*Al_lim/nAl) * j;
