@@ -10,7 +10,7 @@ for A2_ind = A2_i:1:A2_f
         c0_opt(i,A2_ind) = A(A_ind) * options.kw/ks(A2_ind);
     end
     %plot c0_opt
-    plot(lambda_hat,c0_opt(:,A2_ind));
+    plot(log(lambda_hat),log(c0_opt(:,A2_ind)));
     hold on;
     
 end
