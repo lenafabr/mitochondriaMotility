@@ -50,4 +50,5 @@ for k = 1:1:nks
             var_mito(i,j,k) = var(xpos,Tmito) ; %variance in mitochondria position distribution;
         end
     end
+    percent_completed = k/nks * 100;
 end
