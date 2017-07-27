@@ -1,0 +1,61 @@
+options = struct();
+options.nmito = 14*5;
+
+%c0 = 0.01
+
+options.L = 500;
+options.D = 140;
+%options.Km = 0.1/c0;
+%options.startpos = 50;
+options.pstartwalk = 1;
+options.nstep = 1e4;
+options.restart = 1;
+
+
+%options.ks = (1/4.8*1e-6)*c0*(10^-3*6e23/1000/1e12*4^2);
+options.ks = 1;
+options.kw = 1 * 0.01;
+options.delt=5e-2;
+
+options.dodisplay=0;
+options.showevery=1;
+
+
+%run the function
+%change c0 at each iteration, thereby changing A
+%change Kg at every iteration, thereby changing lambda hat
+
+lh = 0.07;
+options.kg = options.D/lh^2/options.nmito/options.L;
+
+A1 = 10^1.9;
+A2 = 10^2.89;
+
+options.c0 = A1*options.kw/options.ks;
+[gluc1,Tmito1,normdtg,gluc_init,xpos1,opt] = runiterativesims(options);
+
+options.c0 = A2*options.kw/options.ks;
+[gluc2,Tmito2,normdtg,gluc_init,xpos2,opt] = runiterativesims(options);
+
+%%
+
+plot(xpos1,gluc1,xpos1,Tmito1*10)
+hold all
+plot(xpos2,gluc2,'--',xpos2,Tmito2*10,'--')
+hold off
+%%
+for i = 1:1:100
+    options.kg = 0.1*i;
+    for j = 1:1:100
+        options.c0 = 0.1*j;
+        [gluc,Tmito,normdtg,gluc_init,opt,lmdh] = runiterativesims(options)
+        A_var(i,j) = opt.ks * opt.c0/opt.kw;
+        A = A_var(i,j);
+        Lambda_hat(i,j) = lmdh;
+        Lh = opt.L/opt.msize;
+        xpos = linspace(0,Lh,opt.gpts)';
+        var_metric(i,j) = var(xpos,Tmito) ; %variance in mitochondria position distribution;
+       
+    end
+end
+
