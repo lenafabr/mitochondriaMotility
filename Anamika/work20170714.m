@@ -13,8 +13,8 @@ options.D = 140;
 options.pstartwalk = 1;
 options.nstep = 1e4;
 options.restart = 1;
-options.km = 30;
-options.c0 = 0.1;
+options.km = 20;
+options.c0 = 1;
 
 %options.ks = (1/4.8*1e-6)*c0*(10^-3*6e23/1000/1e12*4^2);
 options.kw = 1 * 0.01;

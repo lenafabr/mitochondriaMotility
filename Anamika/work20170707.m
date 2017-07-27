@@ -1,4 +1,4 @@
-%run wrapper for runiterativesims function - with changing parameters
+%run wrapper for runiterativesims - with linearly varying c0,Kg (A and l)
 %define options structure
 
 options = struct();
