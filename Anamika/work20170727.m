@@ -15,4 +15,3 @@ for A2_ind = A2_i:1:A2_f
     
 end
 
-
