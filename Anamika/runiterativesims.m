@@ -113,7 +113,7 @@ while (normdtg > dtcutoff)
     normdtg = norm(dtg);
     gluc = gluc+dtg*opt.delt;
     
-    step = step+1
+    step = step+1;
     
     if (step>opt.nstep)
         disp('Failed to converge')
