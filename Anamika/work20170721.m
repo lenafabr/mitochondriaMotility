@@ -13,7 +13,7 @@ options.D = 140;
 options.Km = 1;
 %options.startpos = 50;
 options.pstartwalk = 1;
-options.nstep = 3*1e4;
+options.nstep = 1e5;
 options.restart = 1;
 options.msize = 1;
 
