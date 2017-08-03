@@ -1,4 +1,4 @@
-function [gluc,Tmito,normdtg,gluc_init,opt,xpos,lmdh] = runiterativesims(options)
+function [gluc,Tmito,Smito,Smito_int,normdtg,gluc_init,opt,xpos,lmdh,ftc] = runiterativesims(options)
 %% set up default simulation parameters
 opt = struct();
 
@@ -87,6 +87,7 @@ dtg = zeros(opt.gpts,1);
 %dtg(end) = 0; %fixed boundary conditions
 % dtg(2:end-1) = Dh*d2g(2:end-1);
 % dtg_init = dtg;
+ftc = 0; %flag for failing to converge. Is 1 when fails to converge. 
 
 normdtg = inf;
 
@@ -105,6 +106,8 @@ while (normdtg > dtcutoff)
     ksx = ksh * Kmh * gluc ./ (Kmh + gluc);
     ksx_int = spacing * trapz(ksx);
     Tmito = (ksx/kwh + 1) ./ (Lh + (ksx_int/kwh));
+    Smito = (ksx/kwh) ./ (Lh + (ksx_int/kwh));
+    Smito_int = spacing * trapz(Smito);
     
     %Calculate the change in glucose concentration
     d2g(2:end-1) = (gluc(3:end)+gluc(1:end-2) - 2*gluc(2:end-1))/dx^2; %space double derivative
@@ -117,6 +120,7 @@ while (normdtg > dtcutoff)
     
     if (step>opt.nstep)
         disp('Failed to converge')
+        ftc = 1;
         return
     end
     

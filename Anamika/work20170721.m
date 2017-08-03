@@ -13,7 +13,7 @@ options.D = 140;
 options.Km = 1;
 %options.startpos = 50;
 options.pstartwalk = 1;
-options.nstep = 1e4;
+options.nstep = 3*1e4;
 options.restart = 1;
 options.msize = 1;
 
@@ -25,7 +25,7 @@ options.showevery=1;
 
 A2_llim = -2;
 A2_ulim = 2;
-nA2 = 10;
+nA2 = 5;
 l_llim = -2;
 l_ulim = 0.5;
 nl = 101;
@@ -49,10 +49,11 @@ for k = 1:1:nA2
             logc0 = c0_llim + ((c0_ulim - c0_llim)/nc0) * (j-1);
             options.c0 = 10 .^ (logc0);
             A(j) = options.ks * options.c0 / options.kw;
-            [gluc,Tmito,normdtg,gluc_init,opt,xpos,lmdh] = runiterativesims(options);
+            [gluc,Tmito,Smito,Smito_int,normdtg,gluc_init,opt,xpos,lmdh,ftc] = runiterativesims(options);
+            ftc_matrix(i,j,k) = ftc;
             gluc(:,i,j,k) = gluc;
             var_mito(i,j,k) = var(xpos,Tmito) ; %variance in mitochondria position distribution;
         end
     end
-    percent_completed = k/nA2* 100;
+    percent_completed = (k/nA2)* 100
 end
