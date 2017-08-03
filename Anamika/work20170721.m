@@ -13,7 +13,7 @@ options.D = 140;
 options.Km = 1;
 %options.startpos = 50;
 options.pstartwalk = 1;
-options.nstep = 1e4;
+options.nstep = 3*1e4;
 options.restart = 1;
 options.msize = 1;
 
@@ -23,32 +23,39 @@ options.delt=5e-2;
 options.dodisplay=0;
 options.showevery=1;
 
-ks_lim = 2;
-nks = 100;
-l_lim = 2;
+A2_llim = -2;
+A2_ulim = 2;
+nA2 = 5;
+l_llim = -2;
+l_ulim = 0.5;
 nl = 101;
-c0_lim = 2;
+c0_llim = -1;
+c0_ulim = 2.5;
 nc0 = 102;
 %run the function
-%change ks at every iteration, thereby changing A2
+%change A2 at every iteration, thereby changing ks
 %change lambda hat at every iteration, thereby changing kg
 %change c0 at each iteration, thereby changing A
 
-for k = 1:1:nks
-    logks = -ks_lim + (2*ks_lim/nks) * (k-1);
-    options.ks = 10.^(logks);
-    A2(k) = options.ks * options.Km ./ options.kw;
+for k = 1:1:nA2
+    logA2 = A2_llim + ((A2_ulim - A2_llim)/nA2) * (k-1);
+    A2(k) = 10.^(logA2);
+    options.ks = A2(k) * options.kw ./ options.Km;
     for i = 1:1:nl
-        log_lambda_hat = -l_lim + (2*l_lim/nl) * (i-1);
+        log_lambda_hat = l_llim + ((l_ulim - l_llim)/nl) * (i-1);
         lambda_hat(i) = 10 .^ (log_lambda_hat);
         options.kg = options.D ./ (options.nmito * options.msize * options.L * (lambda_hat(i)^2));
         for j = 1:1:nc0
-            logc0 = -c0_lim + (2*c0_lim/nc0) * (j-1);
+            logc0 = c0_llim + ((c0_ulim - c0_llim)/nc0) * (j-1);
             options.c0 = 10 .^ (logc0);
             A(j) = options.ks * options.c0 / options.kw;
-            [gluc,Tmito,normdtg,gluc_init,opt,xpos,lmdh] = runiterativesims(options)
+            [gluc,Tmito,Smito,Smito_int,normdtg,gluc_init,opt,xpos,lmdh,ftc] = runiterativesims(options);
+            ftc_matrix(i,j,k) = ftc;
+            Smito(:,i,j,k) = Smito;
+            Smito_int(i,j,k) = Smito_int;
+            gluc(:,i,j,k) = gluc;
             var_mito(i,j,k) = var(xpos,Tmito) ; %variance in mitochondria position distribution;
         end
     end
-    percent_completed = k/nks * 100;
+    percent_completed = (k/nA2)* 100
 end

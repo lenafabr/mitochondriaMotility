@@ -1,7 +1,7 @@
 %pull out peak values rowwise and the corresponding values of A
 %plot the c0 vs lambda_hat
 A2_i = 1;
-A2_f = 36;
+A2_f = 5;
 ks = A2*options.kw/options.Km;
 cmat = jet(A2_f-A2_i+1);
 for A2_ind = A2_i:1:A2_f
@@ -20,7 +20,7 @@ hold off
 
 %% look at individual lam-hat vs c0 profiles
 
-A2_ind = 35;
+A2_ind = 1;
 c0vals = A*options.kw/ks(A2_ind);
 varmetric = 6*var_mito/options.L^2 - 0.5;
 pcolor(log10(c0vals),log10(lambda_hat),varmetric(:,:,A2_ind)); shading flat
@@ -28,8 +28,9 @@ xlabel('log10(c0)')
 ylabel('log10(lambda-hat)')
 
 %% look at conc necessary to achieve variance cutoff (upper end)
-A2_ind = 35;
+A2_ind = 3;
 cutoff = 0.03;
+varmetric = 6*var_mito/options.L^2 - 0.5;
 c0vals = A*options.kw/ks(A2_ind);
 for i = 1:1:length(lambda_hat)
     [M,I] = max(varmetric(i,:,A2_ind)');
@@ -60,3 +61,10 @@ loglog(lambda_hat,c0cutoffU, 'r', lambda_hat,c0cutoffL,'b',ll,0.07./ll.^2,ll,0.1
 loglog(lambda_hat,c0cutoff(:,A2_ind),lambda_hat,0.07./lambda_hat.^2)
 xlabel('lambda hat')
 ylabel('conc to get 0.03 cutoff')
+
+%%
+%plot the actual fraction stopped as a function of lambda for different A2
+%values
+for A2 = A2i:1:A2f
+    plot(log(lambda_hat), log(Smito_int(i,j,A2)));
+end
