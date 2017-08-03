@@ -51,6 +51,8 @@ for k = 1:1:nA2
             A(j) = options.ks * options.c0 / options.kw;
             [gluc,Tmito,Smito,Smito_int,normdtg,gluc_init,opt,xpos,lmdh,ftc] = runiterativesims(options);
             ftc_matrix(i,j,k) = ftc;
+            Smito(:,i,j,k) = Smito;
+            Smito_int(i,j,k) = Smito_int;
             gluc(:,i,j,k) = gluc;
             var_mito(i,j,k) = var(xpos,Tmito) ; %variance in mitochondria position distribution;
         end
