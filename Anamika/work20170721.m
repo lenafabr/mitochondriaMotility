@@ -37,6 +37,12 @@ nc0 = 102;
 %change lambda hat at every iteration, thereby changing kg
 %change c0 at each iteration, thereby changing A
 
+c0list = logspace(c0_llim,c0_ulim,nc0);
+
+gluc_all = zeros(100,nl,nc0,nA2);
+Smito_all = zeros(100,nl,nc0,nA2);
+Smito_int_all = zeros(nl,nc0,nA2);
+
 for k = 1:1:nA2
     logA2 = A2_llim + ((A2_ulim - A2_llim)/nA2) * (k-1);
     A2(k) = 10.^(logA2);
@@ -45,15 +51,13 @@ for k = 1:1:nA2
         log_lambda_hat = l_llim + ((l_ulim - l_llim)/nl) * (i-1);
         lambda_hat(i) = 10 .^ (log_lambda_hat);
         options.kg = options.D ./ (options.nmito * options.msize * options.L * (lambda_hat(i)^2));
-        for j = 1:1:nc0
-            logc0 = c0_llim + ((c0_ulim - c0_llim)/nc0) * (j-1);
-            options.c0 = 10 .^ (logc0);
-            A(j) = options.ks * options.c0 / options.kw;
+        for j = 1:1:nc0            
+            options.c0 = c0list(j);            
             [gluc,Tmito,Smito,Smito_int,normdtg,gluc_init,opt,xpos,lmdh,ftc] = runiterativesims(options);
             ftc_matrix(i,j,k) = ftc;
-            Smito(:,i,j,k) = Smito;
-            Smito_int(i,j,k) = Smito_int;
-            gluc(:,i,j,k) = gluc;
+            Smito_all(:,i,j,k) = Smito;
+            Smito_int_all(i,j,k) = Smito_int;
+            gluc_all(:,i,j,k) = gluc;
             var_mito(i,j,k) = var(xpos,Tmito) ; %variance in mitochondria position distribution;
         end
     end
