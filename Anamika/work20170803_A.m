@@ -42,10 +42,10 @@ c0list = logspace(c0_llim,c0_ulim,nc0);
 gluc_all = zeros(100,nl,nc0,nA2);
 Smito_all = zeros(100,nl,nc0,nA2);
 Smito_int_all = zeros(nl,nc0,nA2);
+A2list = [2,10,20,50,100];
 
-for k = 1:1:nA2
-    logA2 = A2_llim + ((A2_ulim - A2_llim)/nA2) * (k-1);
-    A2(k) = 10.^(logA2);
+for k = 1:1:size(A2list,2)
+    A2(k) = A2list(k)
     options.ks = A2(k) * options.kw ./ options.Km;
     for i = 1:1:nl
         log_lambda_hat = l_llim + ((l_ulim - l_llim)/nl) * (i-1);
@@ -61,5 +61,5 @@ for k = 1:1:nA2
             var_mito(i,j,k) = var(xpos,Tmito) ; %variance in mitochondria position distribution;
         end
     end
-    percent_completed = (k/nA2)* 100
+    percent_completed = (k/5)* 100
 end

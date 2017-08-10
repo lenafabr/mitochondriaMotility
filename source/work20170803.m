@@ -1,7 +1,7 @@
 %pull out peak values rowwise and the corresponding values of A
 %plot the c0 vs lambda_hat
 A2_i = 1;
-A2_f = 36;
+A2_f = 4;
 ks = A2*options.kw/options.Km;
 cmat = jet(A2_f-A2_i+1);
 for A2_ind = A2_i:1:A2_f
@@ -20,7 +20,7 @@ hold off
 
 %% look at individual lam-hat vs c0 profiles
 ks = A2*options.kw/options.Km;
-A2_ind = 4;
+A2_ind = 3;
 
 c0vals = logspace(c0_llim,c0_ulim,nc0)
 
