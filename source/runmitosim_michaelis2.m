@@ -228,9 +228,12 @@ for step = 1:opt.nstep
             end
             mval = (var(mitopos)-opt.L^2/12)/(opt.L^2/6);
             title(sprintf('Step %d: variance metric = %0.3f',step,mval))
+            %set(gca,'FontSize',16)
+            %legend('glucose','stopped mito', 'walking mito')
         end
         hold off
         %ylim([0,opt.c0*1.5])
+        %legend('glucose','stopped mito', 'walking mito')
         drawnow
     end
     
