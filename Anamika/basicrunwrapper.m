@@ -18,7 +18,7 @@ options.restart = 1;
 options.showevery = 100;
 options.dodisplay = 0; 
 
-options.cend=1;
+options.cend=options.c0;
 options.ks = (1/4.8*1e-6)*c0*(10^-3*6e23/1000/1e12*4^2);
 options.kw = 1;
 options.delt=5e-2;

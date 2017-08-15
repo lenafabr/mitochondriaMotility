@@ -157,8 +157,8 @@ for step = 1:opt.nstep
     % time derivative due to glucose consumption
     for mc = 1:opt.nmito
         % get indices of spatial points within this mitochondria
-        ind1 = floor((mitopos(mc)-0.5)/dx)+1;
-        ind2 = floor((mitopos(mc)+0.5)/dx);        
+        ind1 = floor((mitopos(mc)-options.msize/2)/dx)+1;
+        ind2 = floor((mitopos(mc)+options.msize/2)/dx);        
         % dimensionless consumption rate of 1
         % note: overlapping mitochondria will consume twice as fast
         dtg(ind1:ind2) = dtg(ind1:ind2)-kgh*Kmh*gluc(ind1:ind2)./(Kmh+gluc(ind1:ind2));
