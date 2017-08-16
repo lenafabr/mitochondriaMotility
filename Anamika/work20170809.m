@@ -1,5 +1,5 @@
 %to figure out c0 values for given varmetric
-%load('workspace_08_09_1e5.mat');
+load('workspace_08_09_1e5.mat');
 lmdh_ind = 22;
 A2_val = 20; A2_ind = 3;
 %% find indexes of c0 for required varmetric value
