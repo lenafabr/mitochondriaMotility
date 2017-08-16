@@ -39,7 +39,7 @@ opt.startgluc = [];
 opt.nmito = 1; % number of mitochondria
 opt.gpts = 100; % number of discrete spatial points for evaluating gluc concentration
 opt.delt = 1e-4; % time-step
-opt.nstep = 1000; % number of steps to run
+opt.nstep = 1e4; % number of steps to run
 
 % boundary conditions on the far size
 % positive = fixed concentration at the boundary
