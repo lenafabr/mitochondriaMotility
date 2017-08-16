@@ -3,7 +3,7 @@ load('workspace_08_09_1e6.mat')
 %%
 load('workspace_08_09_1e5.mat')
 %%
-A2_ind =2;
+A2_ind =1;
 
 ks = A2list(A2_ind)*options.kw/options.Km;
 varmetric = 6*var_mito/options.L^2 - 0.5;
@@ -15,7 +15,7 @@ title(sprintf('A2=%f',A2list(A2_ind)))
 %% look at conc necessary to achieve variance cutoff 
 % upper end
 clear c0cutoffU c0cutoffL
-cutoff = 0.1;
+cutoff = 0.2;
 c0vals = logspace(c0_llim,c0_ulim,nc0);
 for i = 1:1:length(lambda_hat)
     [M,I] = max(varmetric(i,:,A2_ind)');
@@ -41,7 +41,7 @@ end
 
 % plot
 ll = logspace(-2,-1);
-loglog(lambda_hat,c0cutoffU, 'b', lambda_hat,c0cutoffL,'b')%,ll,1./ll.^3,ll,50./ll.^2,ll,30./ll)
+loglog(lambda_hat,c0cutoffU, 'r', lambda_hat,c0cutoffL,'r','LineWidth',2)%,ll,1./ll.^3,ll,50./ll.^2,ll,30./ll)
 xlim([1e-2,1])
 %
 %loglog(lambda_hat,c0cutoff(:,A2_ind),lambda_hat,0.07./lambda_hat.^2)
