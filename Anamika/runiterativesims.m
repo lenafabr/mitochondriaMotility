@@ -115,7 +115,12 @@ while (normdtg > dtcutoff)
     dtg(2:end-1) = Dh*d2g(2:end-1) - (kgh * Kmh * opt.nmito * opt.msize) * (gluc(2:end-1) .* Tmito(2:end-1)) ./ (Kmh + gluc(2:end-1));
     normdtg = norm(dtg);
     gluc = gluc+dtg*opt.delt;
-    
+       
+    if (any(gluc < -1e-3))
+         disp('Concentration went negative. Try smaller timestep.')
+        ftc = 1;
+        return
+    end
     step = step+1;
     
     if (step>opt.nstep)

@@ -31,14 +31,14 @@ ylabel('log10(lambda-hat)')
 title(sprintf('A2=%f',A2(A2_ind)))
 
 %% look at conc necessary to achieve variance cutoff (upper end)
-cutoff = 0.25;
+cutoff = 0.22;
 c0vals = logspace(c0_llim,c0_ulim,nc0);
 for i = 1:1:length(lambda_hat)
     [M,I] = max(varmetric(i,:,A2_ind)');
     if (M<cutoff || varmetric(i,end,A2_ind)>cutoff)
-        c0cutoffU(i,A2_ind) = NaN;
+        c0cutoffU(i) = NaN;
     else
-        c0cutoffU(i,A2_ind) = interp1(varmetric(i,I:end,A2_ind),c0vals(I:end),cutoff);
+        c0cutoffU(i) = interp1(varmetric(i,I:end,A2_ind),c0vals(I:end),cutoff);
     end
 end
 
@@ -48,16 +48,16 @@ c0vals = logspace(c0_llim,c0_ulim,nc0);
 for i = 1:1:length(lambda_hat)
     [M,I] = max(varmetric(i,:,A2_ind)');
     if (M<cutoff || varmetric(i,end,A2_ind)>cutoff)
-        c0cutoffL(i,A2_ind) = NaN;
+        c0cutoffL(i) = NaN;
     else
-        c0cutoffL(i,A2_ind) = interp1(varmetric(i,1:I,A2_ind),c0vals(1:I),cutoff);
+        c0cutoffL(i) = interp1(varmetric(i,1:I,A2_ind),c0vals(1:I),cutoff);
     end
 end
 
 
 %%
 ll = logspace(-2,-1);
-loglog(lambda_hat,c0cutoffU, 'r', lambda_hat,c0cutoffL,'b')%,ll,1./ll.^3,ll,50./ll.^2,ll,30./ll)
+loglog(lambda_hat,c0cutoffU, 'c', lambda_hat,c0cutoffL,'c')%,ll,1./ll.^3,ll,50./ll.^2,ll,30./ll)
 xlim([1e-2,1])
 %
 %loglog(lambda_hat,c0cutoff(:,A2_ind),lambda_hat,0.07./lambda_hat.^2)

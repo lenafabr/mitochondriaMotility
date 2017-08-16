@@ -101,10 +101,10 @@ if (opt.restart)
         error('reflecting boundary not yet implemented')
     else
         if (isempty(opt.startgluc))
-            gluc = linspace(opt.c0,opt.cend,opt.gpts)';
+            gluc = linspace(1,opt.cend/opt.c0,opt.gpts)';
         else
             if (length(opt.startgluc) ~= opt.gpts); error('starting distrib has wrong size'); end
-            gluc = opt.startgluc;
+            gluc = opt.startgluc/opt.c0;
         end
     end
     

@@ -103,10 +103,10 @@ if (opt.restart)
         error('reflecting boundary not yet implemented')
     else
         if (isempty(opt.startgluc))
-            gluc = linspace(opt.c0,opt.cend,opt.gpts)';
+            gluc = linspace(1,opt.cend/opt.c0,opt.gpts)';
         else
             if (length(opt.startgluc) ~= opt.gpts); error('starting distrib has wrong size'); end
-            gluc = opt.startgluc;
+            gluc = opt.startgluc/opt.c0;
         end
     end
     
@@ -191,8 +191,8 @@ for step = 1:opt.nstep
     % decide which mitochondria stop
     % glucose concentrations at mitochondria positions
     glucmito = interp1(xpos,gluc,mitopos(walkind));
-    stoprate = ksh*Kmh*glucmito/(Kmh+glucmito);
-    pstop = 1-exp(-stoprate*glucmito*opt.delt);
+    stoprate = ksh*Kmh*glucmito./(Kmh+glucmito);
+    pstop = 1-exp(-stoprate*opt.delt);
     u = rand(length(walkind),1);
     mitostate(walkind) = mitostate(walkind).*(1 - (u<=pstop));
        
@@ -215,7 +215,8 @@ for step = 1:opt.nstep
                 %plot([mitopos(mc) mitopos(mc)], [ymin,ymax],'LineWidth',2,'Color',[0,0.5,0])
                  plot([mitopos(mc)], [0.5],'o','Color',[0,0.5,0],'LineWidth',2)
             end
-            title(sprintf('Step %d',step))
+            varm = var(mitopos)*6/opt.L^2 - 0.5;
+            title(sprintf('Step %d. Var metric %f',step,varm))
         end
         hold off
         %ylim([0,opt.c0*1.5])
