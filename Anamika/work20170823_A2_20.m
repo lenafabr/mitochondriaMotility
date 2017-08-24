@@ -1,10 +1,13 @@
 %run wrapper for runiterativesims - with log variation of c0,l (A,c0) & A2
 %In a loop,lambda and kg are varied, and in the super loop A2 is varied
 %A2 is varied by changing the ratio ks/kw. kw is kept fixed (at 1)
+%everything same as work20170803_A_2 except nmito = 700 and running only
+%for A2 = 20
+%timstep and dttol also changed to avoid convergence issues 
 %define options structure
 
 options = struct();
-options.nmito = 14*5;
+options.nmito = 700;
 
 %c0 = 0.01
 
@@ -18,7 +21,8 @@ options.restart = 1;
 options.msize = 1;
 
 options.kw = 1;
-options.delt=5e-2;
+options.delt=5e-3;
+options.dttol = 1e-3;
 
 options.dodisplay=0;
 options.showevery=1;
@@ -42,7 +46,7 @@ c0list = logspace(c0_llim,c0_ulim,nc0);
 gluc_all = zeros(100,nl,nc0,nA2);
 Smito_all = zeros(100,nl,nc0,nA2);
 Smito_int_all = zeros(nl,nc0,nA2);
-A2list = [50,100];
+A2list = [20];
 
 for k = 1:1:size(A2list,2)
     A2(k) = A2list(k)
@@ -63,3 +67,12 @@ for k = 1:1:size(A2list,2)
     end
     percent_completed = (k/5)* 100
 end
+%% Calculate varmetric and save
+varmetric = 6*var_mito/options.L^2 - 0.5;
+formatOut = 'yyyymmdd';
+date = datestr(datetime('today'),formatOut);
+%save workspace with today's date'
+filename = strcat('workspace_',date,'A2_20');
+save (filename);
+
+

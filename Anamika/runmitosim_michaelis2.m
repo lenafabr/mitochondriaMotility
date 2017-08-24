@@ -1,4 +1,4 @@
-function [gluc, mitopos, mitostate, opt,lmdh] = runmitosim_michaelis2(options)
+function [gluc, mitopos, mitostate, opt] = runmitosim_michaelis2(options)
 % 
 % %% options for testing
 % options = struct();
@@ -36,10 +36,13 @@ opt.Km = 1;
 % default is to start linear
 opt.startgluc = [];
 
+% fix permanent glucose distribution; do not evolve it
+opt.fixgluc = [];
+
 opt.nmito = 1; % number of mitochondria
 opt.gpts = 100; % number of discrete spatial points for evaluating gluc concentration
 opt.delt = 1e-4; % time-step
-opt.nstep = 1e4; % number of steps to run
+opt.nstep = 1000; % number of steps to run
 
 % boundary conditions on the far size
 % positive = fixed concentration at the boundary
@@ -72,14 +75,15 @@ Lh = opt.L/opt.msize;
 % ksh = opt.ks/opt.kg*opt.c0;
 % Dh = opt.D/opt.msize^2/opt.kg;
 velh = 1;
-kwh = opt.kw/opt.vel*opt.msize;
+kwh = opt.kw/opt.vel*opt.msize
 ksh = opt.ks/opt.vel*opt.c0*opt.msize;
 Dh = opt.D/opt.msize/opt.vel;
 kgh = opt.kg*opt.msize/opt.vel;
 Kmh = opt.Km/opt.c0;
-lmdh = sqrt(Dh./(kgh*opt.nmito*Lh)); %lambda-hat
+
 % spatial resolution
 dx = Lh/(opt.gpts - 1);
+
 %%
 % initialize variables
 
@@ -103,10 +107,10 @@ if (opt.restart)
         error('reflecting boundary not yet implemented')
     else
         if (isempty(opt.startgluc))
-            gluc = linspace(1,opt.cend/opt.c0,opt.gpts)';
+            gluc = linspace(opt.c0,opt.cend,opt.gpts)';
         else
             if (length(opt.startgluc) ~= opt.gpts); error('starting distrib has wrong size'); end
-            gluc = opt.startgluc/opt.c0;
+            gluc = opt.startgluc;
         end
     end
     
@@ -121,6 +125,11 @@ if (opt.restart)
     mitostate = ((u<=0.5)*2-1).*mitostate;
 end
 
+if (~isempty(opt.fixgluc))
+    if (length(opt.fixgluc) ~= length(xpos)); error('wrong length of fixgluc'); end
+    gluc = opt.fixgluc;
+end
+
 mitopos0 = mitopos;
 %% evolve the system over time
 d2g = zeros(opt.gpts,1);
@@ -133,10 +142,11 @@ if (opt.restart); curtime = 0; end
 
 for step = 1:opt.nstep
     
-    if (any(mitopos>Lh-0.5) || any(mitopos<0.5))
+    if (any(mitopos>Lh-0.5) | any(mitopos<0.5))
         error('bad mito positions')
     end
     
+    if (isempty(opt.fixgluc))
     % ---------
     % evolve forward the glucose concentration by 1 time step
     % ----------
@@ -147,8 +157,8 @@ for step = 1:opt.nstep
     % time derivative due to glucose consumption
     for mc = 1:opt.nmito
         % get indices of spatial points within this mitochondria
-        ind1 = floor((mitopos(mc)-0.5)/dx)+1;
-        ind2 = floor((mitopos(mc)+0.5)/dx);        
+        ind1 = floor((mitopos(mc)-options.msize/2)/dx)+1;
+        ind2 = floor((mitopos(mc)+options.msize/2)/dx);        
         % dimensionless consumption rate of 1
         % note: overlapping mitochondria will consume twice as fast
         dtg(ind1:ind2) = dtg(ind1:ind2)-kgh*Kmh*gluc(ind1:ind2)./(Kmh+gluc(ind1:ind2));
@@ -170,6 +180,7 @@ for step = 1:opt.nstep
     if (any(gluc<-1e-3))
         error('negative concentrations!')
     end    
+    end
     
     % move the walking mitochondria
     walkind = find(mitostate);
@@ -191,8 +202,8 @@ for step = 1:opt.nstep
     % decide which mitochondria stop
     % glucose concentrations at mitochondria positions
     glucmito = interp1(xpos,gluc,mitopos(walkind));
-    stoprate = ksh*Kmh*glucmito./(Kmh+glucmito);
-    pstop = 1-exp(-stoprate*opt.delt);
+    stoprate = ksh*Kmh*glucmito/(Kmh+glucmito);
+    pstop = 1-exp(-stoprate*glucmito*opt.delt);
     u = rand(length(walkind),1);
     mitostate(walkind) = mitostate(walkind).*(1 - (u<=pstop));
        
@@ -201,7 +212,7 @@ for step = 1:opt.nstep
     restartind = find(u<=pstart);
     mitostate(stopind(restartind)) = (rand(length(restartind),1)<=0.5)*2 - 1; % start in random direction
     
-    if (opt.dodisplay && mod(step,opt.showevery)==0)
+    if (opt.dodisplay & mod(step,opt.showevery)==0)
         % plot glucose concentration
         plot(xpos,gluc,'.-')
         % plot mitochondria positions
@@ -215,11 +226,14 @@ for step = 1:opt.nstep
                 %plot([mitopos(mc) mitopos(mc)], [ymin,ymax],'LineWidth',2,'Color',[0,0.5,0])
                  plot([mitopos(mc)], [0.5],'o','Color',[0,0.5,0],'LineWidth',2)
             end
-            varm = var(mitopos)*6/opt.L^2 - 0.5;
-            title(sprintf('Step %d. Var metric %f',step,varm))
+            mval = (var(mitopos)-opt.L^2/12)/(opt.L^2/6);
+            title(sprintf('Step %d: variance metric = %0.3f',step,mval))
+            %set(gca,'FontSize',16)
+            %legend('glucose','stopped mito', 'walking mito')
         end
         hold off
         %ylim([0,opt.c0*1.5])
+        %legend('glucose','stopped mito', 'walking mito')
         drawnow
     end
     
