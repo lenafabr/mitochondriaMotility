@@ -42,6 +42,7 @@ date = datestr(datetime('today'),formatOut);
 filename = strcat('workspace_',date,'dis_1');
 save (filename);
 
+
 %% run discrete simulations for c0s in different parts of phase diagram
 %5 parts, below, on between, on, above the curves
  %cut off value for variance is 0.20
@@ -82,16 +83,18 @@ save (filename);
 
 
 %% Compare varmetric for discrete sims to give given value of varmetric 
-load('workspace_08_22_dis_1');
-load('workspace_08_09_1e5.mat');
+clear
+load('workspace_20170827dis_1.mat');
+load('workspace_20170824A2_20.mat');
 
 varmito_dis_mean = mean(varmito_dis,1);
 
 varmetric_dis_1= 6*varmito_dis_mean/options.L^2 - 0.5;
 
 %% Compare varmetric for discrete sims in different part of the phase diagram
-load('workspace_08_22_dis_2');
-load('workspace_08_09_1e5.mat');
+clear
+load('workspace_20170828dis_2.mat');
+load('workspace_20170824A2_20.mat');
 
 varmito_dis_mean = mean(varmito_dis,1);
 
