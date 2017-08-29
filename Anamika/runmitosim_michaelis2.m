@@ -59,6 +59,7 @@ opt.pstartwalk = opt.kw/(opt.kw + opt.ks*opt.c0);
 % displaying plots
 opt.dodisplay = 1;
 opt.showevery = 1;
+opt.showmito = 1;
 
 opt.restart = 1; % flag to enable continuing previous sims
 
@@ -94,7 +95,13 @@ xpos = linspace(0,Lh,opt.gpts)';
 
 if (opt.restart)
     % mitochondria center positions
-    if opt.startpos>0
+    if (length(opt.startpos)>1)
+        % start evenly split between specific positions
+        u = rand(opt.nmito,1);
+        mitopos = zeros(opt.nmito,1);
+        mitopos(u<0.5) = opt.startpos(1);
+        mitopos(u>=0.5) = opt.startpos(2);
+    elseif opt.startpos>0
         % start at specific position
         mitopos = opt.startpos*ones(opt.nmito,1);
     else
@@ -158,8 +165,8 @@ for step = 1:opt.nstep
     % time derivative due to glucose consumption
     for mc = 1:opt.nmito
         % get indices of spatial points within this mitochondria
-        ind1 = floor((mitopos(mc)-options.msize/2)/dx)+1;
-        ind2 = floor((mitopos(mc)+options.msize/2)/dx);        
+        ind1 = floor((mitopos(mc)-1/2)/dx)+1;
+        ind2 = floor((mitopos(mc)+1/2)/dx);        
         % dimensionless consumption rate of 1
         % note: overlapping mitochondria will consume twice as fast
         dtg(ind1:ind2) = dtg(ind1:ind2)-kgh*Kmh*gluc(ind1:ind2)./(Kmh+gluc(ind1:ind2));
@@ -216,22 +223,25 @@ for step = 1:opt.nstep
     if (opt.dodisplay & mod(step,opt.showevery)==0)
         % plot glucose concentration
         plot(xpos,gluc,'.-')
+        ylim([0,1])
         % plot mitochondria positions
-        hold all
-        ymin = min(gluc); ymax = max(gluc);
-        for mc = 1:opt.nmito
-            if (mitostate(mc)==0)
-                %plot([mitopos(mc) mitopos(mc)], [ymin,ymax],'r','LineWidth',2)
-                plot([mitopos(mc)], [0.5],'or','LineWidth',2)
-            else
-                %plot([mitopos(mc) mitopos(mc)], [ymin,ymax],'LineWidth',2,'Color',[0,0.5,0])
-                 plot([mitopos(mc)], [0.5],'o','Color',[0,0.5,0],'LineWidth',2)
+        if (opt.showmito)
+            hold all
+            ymin = min(gluc); ymax = max(gluc);
+            for mc = 1:opt.nmito
+                if (mitostate(mc)==0)
+                    %plot([mitopos(mc) mitopos(mc)], [ymin,ymax],'r','LineWidth',2)
+                    plot([mitopos(mc)], [0.5],'or','LineWidth',2)
+                else
+                    %plot([mitopos(mc) mitopos(mc)], [ymin,ymax],'LineWidth',2,'Color',[0,0.5,0])
+                    plot([mitopos(mc)], [0.5],'o','Color',[0,0.5,0],'LineWidth',2)
+                end
+                %set(gca,'FontSize',16)
+                %legend('glucose','stopped mito', 'walking mito')
             end
-            mval = (var(mitopos)-opt.L^2/12)/(opt.L^2/6);
-            title(sprintf('Step %d: variance metric = %0.3f',step,mval))
-            %set(gca,'FontSize',16)
-            %legend('glucose','stopped mito', 'walking mito')
         end
+        mval = (var(mitopos)-opt.L^2/12)/(opt.L^2/6);
+        title(sprintf('Step %d: variance metric = %0.3f',step,mval))
         hold off
         %ylim([0,opt.c0*1.5])
         %legend('glucose','stopped mito', 'walking mito')
