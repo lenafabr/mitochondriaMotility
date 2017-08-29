@@ -11,7 +11,7 @@ options.kg = 0.2*4;
 options.Km = 0.1/c0*1000;
 %options.startpos = 50;
 options.pstartwalk = 1;
-options.nstep = 1e4;
+options.nstep = 5e4;
 
 options.showevery = 100;
  

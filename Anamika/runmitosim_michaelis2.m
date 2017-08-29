@@ -1,4 +1,4 @@
-function [gluc, mitopos, mitostate, opt,lmdh] = runmitosim_michaelis2(options)
+function [gluc, mitopos, mitostate, opt,lmdh,M] = runmitosim_michaelis2(options)
 % 
 % %% options for testing
 % options = struct();
@@ -58,6 +58,8 @@ opt.dodisplay = 1;
 opt.showevery = 1;
 
 opt.restart = 1; % flag to enable continuing previous sims
+
+opt.savemovie = 0; % save movie for output
 
 % copy over supplied options to replace the defaults
 if (exist('options')==1)
@@ -130,6 +132,11 @@ dtg = d2g;
 pstart = 1 - exp(-kwh*opt.delt);
 
 if (opt.restart); curtime = 0; end
+
+if (opt.savemovie)
+    ct= 0;
+    clear M
+end
 
 for step = 1:opt.nstep
     
@@ -215,12 +222,23 @@ for step = 1:opt.nstep
                 %plot([mitopos(mc) mitopos(mc)], [ymin,ymax],'LineWidth',2,'Color',[0,0.5,0])
                  plot([mitopos(mc)], [0.5],'o','Color',[0,0.5,0],'LineWidth',2)
             end
+            
+        end
+        hold off
+        
+        %ylim([0,opt.c0*1.5])
+        if (opt.savemovie)
+            set(gca,'Position',[0.05 0.05 0.9 0.9],'XTickLabel',[],'YTickLabel',[],'LineWidth',1)
+        else
             varm = var(mitopos)*6/opt.L^2 - 0.5;
             title(sprintf('Step %d. Var metric %f',step,varm))
         end
-        hold off
-        %ylim([0,opt.c0*1.5])
         drawnow
+        
+        if (opt.savemovie)
+            ct = ct+1;
+            M(ct) = getframe(gcf);
+        end
     end
     
     curtime = curtime + opt.delt;
