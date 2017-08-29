@@ -80,6 +80,7 @@ ksh = opt.ks/opt.vel*opt.c0*opt.msize;
 Dh = opt.D/opt.msize/opt.vel;
 kgh = opt.kg*opt.msize/opt.vel;
 Kmh = opt.Km/opt.c0;
+cendh = opt.cend/opt.c0;
 
 % spatial resolution
 dx = Lh/(opt.gpts - 1);
@@ -107,7 +108,7 @@ if (opt.restart)
         error('reflecting boundary not yet implemented')
     else
         if (isempty(opt.startgluc))
-            gluc = linspace(opt.c0,opt.cend,opt.gpts)';
+            gluc = linspace(1,cendh,opt.gpts)';
         else
             if (length(opt.startgluc) ~= opt.gpts); error('starting distrib has wrong size'); end
             gluc = opt.startgluc;
@@ -202,8 +203,8 @@ for step = 1:opt.nstep
     % decide which mitochondria stop
     % glucose concentrations at mitochondria positions
     glucmito = interp1(xpos,gluc,mitopos(walkind));
-    stoprate = ksh*Kmh*glucmito/(Kmh+glucmito);
-    pstop = 1-exp(-stoprate*glucmito*opt.delt);
+    stoprate = ksh*Kmh*glucmito./(Kmh+glucmito);
+    pstop = 1-exp(-stoprate*opt.delt);
     u = rand(length(walkind),1);
     mitostate(walkind) = mitostate(walkind).*(1 - (u<=pstop));
        
