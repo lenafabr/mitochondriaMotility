@@ -1,6 +1,9 @@
 %run wrapper for runiterativesims - with log variation of c0,l (A,c0) & A2
 %In a loop,lambda and kg are varied, and in the super loop A2 is varied
 %A2 is varied by changing the ratio ks/kw. kw is kept fixed (at 1)
+%A2 = 50,100 in this set of sims
+%options.delt (time step) reduced to resolve convergence issues
+%dttol also increased
 %define options structure
 
 options = struct();
@@ -13,12 +16,13 @@ options.D = 140;
 options.Km = 1;
 %options.startpos = 50;
 options.pstartwalk = 1;
-options.nstep = 1e5;
+options.nstep = 1e5; 
+options.dttol = 1e-3;
 options.restart = 1;
 options.msize = 1;
 
 options.kw = 1;
-options.delt=5e-2;
+options.delt= 1e-5; %time step reduced from 5e-2 
 
 options.dodisplay=0;
 options.showevery=1;

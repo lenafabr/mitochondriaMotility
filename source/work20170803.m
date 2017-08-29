@@ -20,7 +20,7 @@ hold off
 
 %% look at individual lam-hat vs c0 profiles
 ks = A2*options.kw/options.Km;
-A2_ind = 3;
+A2_ind = 2;
 
 c0vals = logspace(c0_llim,c0_ulim,nc0)
 
