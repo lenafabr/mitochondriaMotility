@@ -50,20 +50,22 @@ hold off
 
 
 %% run discrete sims for comparison
-options.nstep = 1e5;
+options.nstep = 1e6;
 options.kw = 1;
 options.showmito = 1;
 options.showevery = 100;
-options.startpos = [10,490];
-%options.nmito = 70;
-%options.ks = 10;
-%options.c0 = 3;
-%options.cend = 3;
+
+% TRY STARTING UNIFORM
+%options.startpos = -1;
+% TRY STARTING AT EDGES
+%options.startpos = [10,490];
+% TRY STARTING AT CONTINUOUS SOLUTION
+options.startpos = startpos';
+
 options.delt = 0.05;
-nitr = 1;
+nitr = 100;
 options.pstartwalk = 1;
 options.startgluc = gluc;
-options.startpos = startpos';
 %
 clear varmito gluc_dis mitopos_dis
 for j = 1:1:nitr
