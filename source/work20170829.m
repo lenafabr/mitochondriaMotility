@@ -76,3 +76,9 @@ for j = 1:1:nitr
     
     [j varmito(j)]
 end
+%save the workspace
+formatOut = 'yyyymmdd';
+date = datestr(datetime('today'),formatOut);
+%save workspace with today's date'
+filename = strcat('workspace_',date,'continuous_sol');
+save (filename);
