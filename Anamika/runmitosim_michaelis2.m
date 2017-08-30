@@ -82,6 +82,7 @@ Dh = opt.D/opt.msize/opt.vel;
 kgh = opt.kg*opt.msize/opt.vel;
 Kmh = opt.Km/opt.c0;
 cendh = opt.cend/opt.c0;
+startpos = opt.startpos/opt.msize;
 
 % spatial resolution
 dx = Lh/(opt.gpts - 1);
@@ -95,15 +96,18 @@ xpos = linspace(0,Lh,opt.gpts)';
 
 if (opt.restart)
     % mitochondria center positions
-    if (length(opt.startpos)>1)
+    if (length(opt.startpos) == opt.nmito)
+        % start with predefined positions
+        mitopos = startpos;
+    elseif (length(opt.startpos)==2)
         % start evenly split between specific positions
         u = rand(opt.nmito,1);
         mitopos = zeros(opt.nmito,1);
-        mitopos(u<0.5) = opt.startpos(1);
-        mitopos(u>=0.5) = opt.startpos(2);
+        mitopos(u<0.5) = startpos(1);
+        mitopos(u>=0.5) = startpos(2);
     elseif opt.startpos>0
         % start at specific position
-        mitopos = opt.startpos*ones(opt.nmito,1);
+        mitopos = startpos*ones(opt.nmito,1);
     else
         % start uniformly distributed btwn 1 and Lh-1
         mitopos = rand(opt.nmito,1)*(Lh-2)+1;
