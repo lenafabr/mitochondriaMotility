@@ -1,4 +1,7 @@
+%This code is the same as work20170829.m except the starting distribution
+%is from the edges
 % run iterative sim (check glucose profile and mitochondria distrib)
+
 
 options.ks = 5; 
 options.kg = 1;
@@ -6,7 +9,7 @@ options.c0 = 1;
 options.cend = options.c0;
 options.nmito = 100;
 nitr = 10;
-options.dodisplay=1;
+options.dodisplay=0;
 options.showevery=100;
 options.delt = 0.05;
 options.L = 500;
@@ -56,11 +59,11 @@ options.showmito = 1;
 options.showevery = 100;
 
 % TRY STARTING UNIFORM
-%options.startpos = -1;
+options.startpos = -1;
 % TRY STARTING AT EDGES
 %options.startpos = [10,490];
 % TRY STARTING AT CONTINUOUS SOLUTION
-options.startpos = startpos';
+%options.startpos = startpos';
 
 options.delt = 0.05;
 nitr = 100;
@@ -80,5 +83,5 @@ end
 formatOut = 'yyyymmdd';
 date = datestr(datetime('today'),formatOut);
 %save workspace with today's date'
-filename = strcat('workspace_',date,'continuous_sol');
+filename = strcat('workspace_',date,'edges');
 save (filename);

@@ -28,7 +28,6 @@ xlabel('log10(c0)')
 ylabel('log10(lambda-hat)')
 
 %% look at conc necessary to achieve variance cutoff (upper end)
-A2_ind = 3;
 cutoff = 0.03;
 varmetric = 6*var_mito/options.L^2 - 0.5;
 c0vals = A*options.kw/ks(A2_ind);

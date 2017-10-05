@@ -1,10 +1,13 @@
+%exact same as work20170829 - except for new set of parameters
+%these new parameters give a more extreme varmetric value
+%expect varmetric = .24 from iterative sims
 % run iterative sim (check glucose profile and mitochondria distrib)
 
-options.ks = 5; 
-options.kg = 1;
-options.c0 = 1;
+options.ks = 50; 
+options.kg = 0.1;
+options.c0 = 0.1;
 options.cend = options.c0;
-options.nmito = 100;
+options.nmito = 500;
 nitr = 10;
 options.dodisplay=1;
 options.showevery=100;
