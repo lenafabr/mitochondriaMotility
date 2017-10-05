@@ -2,7 +2,7 @@ load('workspace_08_09_1e6.mat')
 
 %%
 load('workspace_08_09_1e5.mat')
-%%
+%% plot variance metric
 A2_ind =1;
 
 ks = A2list(A2_ind)*options.kw/options.Km;
@@ -12,10 +12,22 @@ xlabel('log10(c0)')
 ylabel('log10(lambda-hat)')
 title(sprintf('A2=%f',A2list(A2_ind)))
 
+%% plot fraction of time in motion
+A2_ind =1;
+pcolor(log10(c0list),log10(lambda_hat),Smito_int_all(:,:,A2_ind)); shading flat
+
+%% find right fraction of time in motion 
+for cc = 1:length(c0list)
+    loglamfrac(cc) = interp1(Smito_int_all(:,cc,A2_ind),log10(lambda_hat),0.75);
+end
+
+hold all
+plot(log10(c0list),loglamfrac,'k','LineWidth',2)
+hold off
 %% look at conc necessary to achieve variance cutoff 
 % upper end
 clear c0cutoffU c0cutoffL
-cutoff = 0.2;
+cutoff = 0.15;
 c0vals = logspace(c0_llim,c0_ulim,nc0);
 for i = 1:1:length(lambda_hat)
     [M,I] = max(varmetric(i,:,A2_ind)');
@@ -48,7 +60,9 @@ xlim([1e-2,1])
 xlabel('lambda hat')
 ylabel(sprintf('conc to get %f cutoff',cutoff))
 
-
+hold all
+loglog(10.^loglamfrac,c0list,'k','LineWidth',2)
+hold off
 % -------------
 %% discrete sims for different variance metrics (what variance metric is reasonable to use?)
 % generated with Anamika/work20170809.m

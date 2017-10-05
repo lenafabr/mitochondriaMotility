@@ -16,9 +16,9 @@ varmetric = varmito*6/(opt.L-1)^2 - 0.5
 mean(varmetric)
 optdisc = opt;
 %% iterative sims for same parameters
-options.ks = optdisc.ks*10; 
-options.kg = optdisc.kg*0.1;
-options.c0 = optdisc.c0*0.1;
+options.ks = optdisc.ks*0.2; 
+options.kg = optdisc.kg;
+options.c0 = optdisc.c0*10;
 %options.ks = optdisc.ks; 
 %options.kg = optdisc.kg;
 %options.c0 = optdisc.c0;
@@ -27,10 +27,10 @@ options.nmito = 500;%optdisc.nmito;
 
 options.dodisplay=1;
 options.showevery=100;
-options.delt = 0.001;
+options.delt = 0.005;
 options.L = 500;
 
-options.gpts = 500;
+options.gpts = 200;
 options.nstep = 1e5;
 options.dttol = 1e-3;
 [gluc,Tmito,Smito,Smito_int,normdtg,gluc_init,opt,xpos,lmdh,ftc] = runiterativesims(options);
@@ -38,6 +38,11 @@ options.dttol = 1e-3;
 varmito = var(xpos,Tmito);
 varmetric = varmito*6/options.L^2 - 0.5
 
+%% look at density in edge region
+ind = find(xpos<50);
+density = sum(Tmito(ind))*(xpos(2)-xpos(1))
+duniform = 0.1
+changedens = (density-duniform)/density
 %% run more discrete sims for comparison
 options.nstep = 2e5;
 options.kw = 1;
