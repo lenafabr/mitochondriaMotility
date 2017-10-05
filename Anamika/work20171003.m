@@ -5,14 +5,14 @@
 
 % set up parameter values different from default
 
-l_llim = -2;
-l_ulim = 2;
+l_llim = -1;
+l_ulim = 1;
 nl = 101;
-c0_llim = -2;
+c0_llim = -3;
 c0_ulim = 2;
 nc0 = 102;
 options.gpts = 100;
-options.nmito = 100;
+options.nmito = 500;
 options.L = 500;
 options.msize = 1;
 options.D = 140;
@@ -29,11 +29,13 @@ Tmito_all = zeros(options.gpts,nl,nc0);
 
 
 for i = 1:1:nl
-    lambda_hat(i) = 10 .^ (llist(i));
+    lambda_hat(i) = llist(i);
     options.kg = options.D ./ (options.nmito * options.msize * options.L * (lambda_hat(i)^2));
     for j = 1:1:nc0
         options.c0 = c0list(j);
         [Gstat,Gstat_prime,Tmito,ksx_calc,gluc_init,opt,xpos] = runnumericsim(options);
+        option_list(i,j) = opt;
+        gluc_init_all(:,i,j) = gluc_init;
         Gstat_all(:,i,j) = Gstat;
         Tmito_all(:,i,j) = Tmito;
         var_mito(i,j) = var(xpos,Tmito) ; %variance in mitochondria position distribution;
@@ -41,5 +43,40 @@ for i = 1:1:nl
     end
 end
 
+%% look at conc necessary to achieve variance cutoff 
+% upper end
+
+cutoff = 0.2;
+c0vals = logspace(c0_llim,c0_ulim,nc0);
+for i = 1:1:length(lambda_hat)
+    [M,I] = max(varmetric(i,:)');
+    if (M<cutoff || varmetric(i,end)>cutoff)
+        c0cutoffU(i) = NaN;
+    else
+        c0cutoffU(i) = interp1(varmetric(i,I:end),c0vals(I:end),cutoff);
+    end
+end
+
+
+% (lower end)
+c0vals = logspace(c0_llim,c0_ulim,nc0);
+for i = 1:1:length(lambda_hat)
+    [M,I] = max(varmetric(i,:)');
+    if (M<cutoff || varmetric(i,end)>cutoff)
+        c0cutoffL(i) = NaN;
+    else
+        c0cutoffL(i) = interp1(varmetric(i,1:I),c0vals(1:I),cutoff);
+    end
+end
+
+
+% plot
+ll = logspace(-2,-1);
+loglog(lambda_hat,c0cutoffU,'r',lambda_hat,c0cutoffL, 'r','LineWidth',2)%,ll,1./ll.^3,ll,50./ll.^2,ll,30./ll)
+xlim([1e-2,1])
+%
+%loglog(lambda_hat,c0cutoff(:,A2_ind),lambda_hat,0.07./lambda_hat.^2)
+xlabel('lambda hat')
+ylabel(sprintf('conc to get %f cutoff',cutoff))
 
 

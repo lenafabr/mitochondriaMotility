@@ -5,7 +5,7 @@ function [Gstat,Gstat_prime,Tmito,ksx_calc,gluc_init,opt,xpos] = runnumericsim(o
 %% set up default simulation parameters
 opt = struct();
 
-opt.kg = 1; % rate of glucose consumption
+opt.kg = 0.1; % rate of glucose consumption
 opt.c0 = 0.1; % fixed glucose concentration
 opt.msize = 1; % mitochondria size
 
@@ -21,10 +21,10 @@ opt.Km = 1;
 % default is to start linear
 opt.startgluc = [];
 
-opt.nmito = 100; % number of mitochondria
+opt.nmito = 500; % number of mitochondria
 opt.gpts = 100; % number of discrete spatial points for evaluating gluc concentration
-opt.delt = 1e-4; % time-step
-opt.nstep = 1e5; % number of steps to run
+opt.delt = 1e-3; % time-step
+opt.nstep = 1e6; % number of steps to run
 
 
 
@@ -103,13 +103,13 @@ initglucint = spacing * trapz(gluc_init);
 %% Solve the DE for G using bvp - using bvp4c
 %G_prime_init = (gluc_init(2) - gluc_init(1)) / spacing;
 a = gluc_init(1);
-b = gluc_init(2);
+b = gluc_init(end);
 ksx = ksh * Kmh * gluc ./ (Kmh + gluc);
 ksx_int = spacing * trapz(ksx);
 const = opt.nmito * opt.msize ./ (Dh * ksx_int);
 dGdx = @(x,G) [G(2); const * (((kgh*Kmh*G(1))/ (Kmh + G(1)))^2)];
 res = @(G0,GL) [G0(1)-a; GL(1)-b];
-solinit = bvpinit(xpos,[opt.c0,0]);
+solinit = bvpinit(xpos,[gluc_init(1),0]);
 Gstat_fn = bvp4c(dGdx,res,solinit);
 Gstat_pts = deval(xpos,Gstat_fn);
 Gstat = Gstat_pts(1,:);
