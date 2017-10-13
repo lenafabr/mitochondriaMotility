@@ -55,7 +55,7 @@ date = datestr(datetime('today'),formatOut);
 filename = strcat('workspace_',date,'gstat2');
 save (filename);
 
-%% get surface plot of varmetric vs c0 and ks
+%% get surface plot of varmetric vs c0 and lambda
 figure;
 varmetric = 6*var_mito/options.L^2 - 0.5;
 colormap jet;
@@ -89,10 +89,16 @@ for i = 1:1:length(lambda_hat)
     end
 end
 
-
+%%
 % plot
+% ncL = size(c0cutoffL);
+% 
+% c0cutoffLplot(ncL(2)+1:nl) = 0;
+% c0cutoffLplot(1:ncL(2)) = c0cutoffL(1,:);
+figure(2);
 ll = logspace(-2,-1);
-loglog(lambda_hat,c0cutoffU,'r',lambda_hat,c0cutoffL, 'r','LineWidth',2)%,ll,1./ll.^3,ll,50./ll.^2,ll,30./ll)
+%loglog(lambda_hat,c0cutoffU,'r',lambda_hat,c0cutoffL, 'r','LineWidth',2)%,ll,1./ll.^3,ll,50./ll.^2,ll,30./ll)
+loglog(lambda_hat,c0cutoffU,'r','LineWidth',2)%,ll,1./ll.^3,ll,50./ll.^2,ll,30./ll)
 xlim([1e-2,1])
 %
 %loglog(lambda_hat,c0cutoff(:,A2_ind),lambda_hat,0.07./lambda_hat.^2)

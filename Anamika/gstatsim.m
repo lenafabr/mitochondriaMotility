@@ -104,14 +104,13 @@ step = 0;
 while (normdtg > dtcutoff)
     
     %Calculate distribution of total number of mitochondria
-    ksx = ksh * Kmh * gluc ./ (Kmh + gluc);
-    ksx_int = spacing * trapz(ksx);
-    Tmito = ksx / ksx_int;
+    integ =  spacing * trapz(Kmh * gluc ./ (Kmh + gluc));
+    Tmito = (Kmh * gluc ./ (Kmh + gluc))/ integ;
 
    %Calculate the change in glucose concentration
     d2g(2:end-1) = (gluc(3:end)+gluc(1:end-2) - 2*gluc(2:end-1))/dx^2; %space double derivative
     % time derivative of glucose
-    dtg(2:end-1) = Dh*d2g(2:end-1) - (opt.nmito * opt.msize/ksx_int)* ((kgh * Kmh * gluc(2:end-1)) ./ (Kmh + gluc(2:end-1))).^2 ;
+    dtg(2:end-1) = Dh*d2g(2:end-1) - ((opt.nmito * opt.msize * kgh /integ)  * (((Kmh * gluc(2:end-1)) ./ (Kmh + gluc(2:end-1))).^2));
     normdtg = norm(dtg);
     gluc = gluc+dtg*opt.delt;
     
@@ -139,7 +138,8 @@ while (normdtg > dtcutoff)
         drawnow
     end
     Gstat = gluc;
-    ksx_stat = ksx;
+    ksx_stat = (ksh * Kmh * Gstat) ./ (Kmh + Gstat);
+    
 end
 
 end
