@@ -1,8 +1,5 @@
-%% Run wrapper for run numeric sims for high ks
-%changing lambda_hat through Kg
-%changing c0_hat = c0/Km
-%limit of high ks 
-
+%run wrapper for permeablesims - implementing permeability conditions
+%This run wrapper is for changing lambda_hat and fixed ks
 % set up parameter values different from default
 
 l_llim = -1.75;
@@ -20,6 +17,10 @@ options.dodisplay = 0;
 options.nmito = 100;
 options.dttol = 1e-3;
 options.nsteps = 1e4;
+options.ks = 20;
+options.kw = 1;
+options.Km = 1;
+options.P = 0.1;
 
 
 %run the function
@@ -29,8 +30,6 @@ options.nsteps = 1e4;
 c0list = logspace(c0_llim,c0_ulim,nc0);
 llist = logspace(l_llim,l_ulim,nl);
 
-Gstat_all = zeros(options.gpts,nl,nc0);
-Tmito_all = zeros(options.gpts,nl,nc0);
 
 for i = 1:1:nl
     lambda_hat(i) = llist(i);
@@ -38,21 +37,25 @@ for i = 1:1:nl
     for j = 1:1:nc0
         options.c0 = c0list(j);
         options.cend = options.c0;
-        [Gstat,Tmito,ksx_stat,gluc_init,opt,xpos,ftc] = gstatsim(options);
+        [gluc,Tmito,Smito,Smito_int,normdtg,gluc_init,opt,xpos,lmdh,ftc] = permeablesims(options);
         ftc_matrix(i,j) = ftc;
         option_list(i,j) = opt;
         gluc_init_all(:,i,j) = gluc_init;
-        Gstat_all(:,i,j) = Gstat;
+        gluc_all(:,i,j) = gluc;
         Tmito_all(:,i,j) = Tmito;
-        var_mito(i,j) = var(xpos,Tmito) ; %variance in mitochondria position distribution;
+        Smito_all(:,i,j) = Smito;
+        Smito_int_all(i,j) = Smito_int;
+        var_mito(i,j) = var(xpos,Tmito(2:end-1)) ; %variance in mitochondria position distribution;
         varmetric(i,j) = 6*var_mito(i,j)/options.L^2 - 0.5;
     end
+    percent_complete = (i/nl) * 100  
 end
+
 %save the workspace
 formatOut = 'yyyymmdd';
 date = datestr(datetime('today'),formatOut);
 %save workspace with today's date'
-filename = strcat('workspace_',date,'gstat2');
+filename = strcat('workspace_',date,'perm_l_c0');
 save (filename);
 
 %% get surface plot of varmetric vs c0 and lambda
@@ -104,5 +107,3 @@ xlim([1e-2,1])
 %loglog(lambda_hat,c0cutoff(:,A2_ind),lambda_hat,0.07./lambda_hat.^2)
 xlabel('lambda hat')
 ylabel(sprintf('conc to get %f cutoff',cutoff))
-
-
