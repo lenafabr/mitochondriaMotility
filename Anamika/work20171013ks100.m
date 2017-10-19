@@ -1,7 +1,7 @@
-%% Run wrapper for run numeric sims for high ks
+%% Run wrapper for high ks (ks = 100)
 %changing lambda_hat through Kg
 %changing c0_hat = c0/Km
-%limit of high ks 
+ 
 
 % set up parameter values different from default
 
@@ -20,6 +20,7 @@ options.dodisplay = 0;
 options.nmito = 100;
 options.dttol = 1e-3;
 options.nsteps = 1e4;
+options.ks = 100;
 
 
 %run the function
@@ -29,7 +30,7 @@ options.nsteps = 1e4;
 c0list = logspace(c0_llim,c0_ulim,nc0);
 llist = logspace(l_llim,l_ulim,nl);
 
-Gstat_all = zeros(options.gpts,nl,nc0);
+gluc_all = zeros(options.gpts,nl,nc0);
 Tmito_all = zeros(options.gpts,nl,nc0);
 
 for i = 1:1:nl
@@ -38,12 +39,14 @@ for i = 1:1:nl
     for j = 1:1:nc0
         options.c0 = c0list(j);
         options.cend = options.c0;
-        [Gstat,Tmito,ksx_stat,gluc_init,opt,xpos,ftc] = gstatsim(options);
+        [gluc,Tmito,Smito,Smito_int,normdtg,gluc_init,opt,xpos,lmdh,ftc] = runiterativesims(options);
         ftc_matrix(i,j) = ftc;
         option_list(i,j) = opt;
         gluc_init_all(:,i,j) = gluc_init;
-        Gstat_all(:,i,j) = Gstat;
+        gluc_all(:,i,j) = gluc;
         Tmito_all(:,i,j) = Tmito;
+        Smito_int_all(:,i,j) = Smito_int;
+        Smito_all(:,i,j) = Smito;
         var_mito(i,j) = var(xpos,Tmito) ; %variance in mitochondria position distribution;
         varmetric(i,j) = 6*var_mito(i,j)/options.L^2 - 0.5;
     end
@@ -52,7 +55,7 @@ end
 formatOut = 'yyyymmdd';
 date = datestr(datetime('today'),formatOut);
 %save workspace with today's date'
-filename = strcat('workspace_',date,'gstat2');
+filename = strcat('workspace_',date,'ks100');
 save (filename);
 
 %% get surface plot of varmetric vs c0 and lambda
@@ -104,5 +107,3 @@ xlim([1e-2,1])
 %loglog(lambda_hat,c0cutoff(:,A2_ind),lambda_hat,0.07./lambda_hat.^2)
 xlabel('lambda hat')
 ylabel(sprintf('conc to get %f cutoff',cutoff))
-
-
