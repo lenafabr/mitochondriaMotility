@@ -12,7 +12,7 @@ c0_llim = -3;
 c0_ulim = 2;
 nc0 = 102;
 options.gpts = 100;
-options.nmito = 500;
+options.nmito = 70;
 options.L = 500;
 options.msize = 1;
 options.D = 140;
@@ -52,17 +52,25 @@ end
 formatOut = 'yyyymmdd';
 date = datestr(datetime('today'),formatOut);
 %save workspace with today's date'
-filename = strcat('workspace_',date,'gstat2');
+filename = strcat('workspace_',date,'gstat2_nmito70');
 save (filename);
 
 %% get surface plot of varmetric vs c0 and lambda
 figure;
 varmetric = 6*var_mito/options.L^2 - 0.5;
 colormap jet;
-pcolor(log10(c0list),log10(llist),varmetric); shading flat
+pcolor(log10(c0list),log10(lambda_hat),varmetric); shading flat
 xlabel('log10(c0)')
 ylabel('log10(lambda)')
 title(sprintf('varmetric plot for ks = 50'));
+
+%%
+cutoff = 0.15;
+c0vals = logspace(c0_llim,c0_ulim,nc0);
+for i = 1:1:length(lambda_hat)
+    c0cutoffU(i) = interp1(varmetric(i,1:end),c0vals(1:end),cutoff);    
+end
+
 %% look at conc necessary to achieve variance cutoff 
 % upper end
 
@@ -78,7 +86,7 @@ for i = 1:1:length(lambda_hat)
 end
 
 
-% (lower end)
+%% (lower end)
 c0vals = logspace(c0_llim,c0_ulim,nc0);
 for i = 1:1:length(lambda_hat)
     [M,I] = max(varmetric(i,:)');
@@ -95,10 +103,10 @@ end
 % 
 % c0cutoffLplot(ncL(2)+1:nl) = 0;
 % c0cutoffLplot(1:ncL(2)) = c0cutoffL(1,:);
-figure(2);
+%figure(2);
 ll = logspace(-2,-1);
 %loglog(lambda_hat,c0cutoffU,'r',lambda_hat,c0cutoffL, 'r','LineWidth',2)%,ll,1./ll.^3,ll,50./ll.^2,ll,30./ll)
-loglog(lambda_hat,c0cutoffU,'r','LineWidth',2)%,ll,1./ll.^3,ll,50./ll.^2,ll,30./ll)
+loglog(lambda_hat,c0cutoffU,'g','LineWidth',2)%,ll,1./ll.^3,ll,50./ll.^2,ll,30./ll)
 xlim([1e-2,1])
 %
 %loglog(lambda_hat,c0cutoff(:,A2_ind),lambda_hat,0.07./lambda_hat.^2)

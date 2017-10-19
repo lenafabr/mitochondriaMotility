@@ -53,7 +53,7 @@ end
 
 % plot
 ll = logspace(-2,-1);
-loglog(lambda_hat,c0cutoffU, 'r', lambda_hat,c0cutoffL,'r','LineWidth',2)%,ll,1./ll.^3,ll,50./ll.^2,ll,30./ll)
+loglog(lambda_hat,c0cutoffU, 'b', lambda_hat,c0cutoffL,'b','LineWidth',2)%,ll,1./ll.^3,ll,50./ll.^2,ll,30./ll)
 xlim([1e-2,1])
 %
 %loglog(lambda_hat,c0cutoff(:,A2_ind),lambda_hat,0.07./lambda_hat.^2)
