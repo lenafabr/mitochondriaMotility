@@ -5,15 +5,13 @@
 
 % set up parameter values different from default
 
-options.gpts = 100;
-options.nmito = 70;
 options.L = 500;
 options.msize = 1;
 options.D = 140;
 options.dodisplay = 0;
-options.nmito = 100;
+options.nmito = 70;
 options.dttol = 1e-2;
-options.nsteps = 1e6;
+options.nsteps = 1e7;
 lambda_hat = 0.05;
 options.gpts = 500; %5 times 100
 options.c0 = 80;
