@@ -78,8 +78,14 @@ dx = Lh/(opt.gpts - 1);
 % spatial positions at which glucose is evaluated
 % index 1 = point on domain edge
 xpos = linspace(0,Lh,opt.gpts)'; 
-lmdh = sqrt(Dh./(kgh*opt.nmito*Lh)); %lambda-hat
-gluc_init =  cosh((xpos-Lh/2)./(Lh * lmdh)) ./ cosh(0.5/lmdh);
+
+if (~isempty(opt.startgluc))
+    if (length(opt.startgluc) ~= opt.gpts); error('starting distrib has wrong size'); end
+    gluc_init = opt.startgluc;
+else
+    lmdh = sqrt(Dh./(kgh*opt.nmito*Lh)); %lambda-hat
+    gluc_init =  cosh((xpos-Lh/2)./(Lh * lmdh)) ./ cosh(0.5/lmdh);
+end
 gluc = gluc_init;
 d2g = zeros(opt.gpts+2,1); %increased size to cater for new end points
 dtg = zeros(opt.gpts+2,1); %increased size to cater to new end points
@@ -99,7 +105,7 @@ ftc = 0; %flag for failing to converge. Is 1 when fails to converge.
 
 normdtg = inf;
 
-dtcutoff = opt.dttol*(kgh*Kmh/(Kmh+1));
+dtcutoff = opt.dttol;%*(kgh*Kmh/(Kmh+1));
 spacing = dx; %integration spacing
 
 initglucint = spacing * trapz(gluc_init);
@@ -124,9 +130,7 @@ while (normdtg > dtcutoff)
     gluc_end = gluc(opt.gpts-1) + (2*opt.P*(opt.c0 - gluc(opt.gpts))*dx / Dh);
     
     %define gluc_new to be the new glucose vector to work with
-    gluc_new(1) = gluc_start;
-    gluc_new(2:opt.gpts+1) = gluc;
-    gluc_new(opt.gpts+2) = gluc_end;
+    gluc_new = [gluc_start; gluc; gluc_end];    
 
     %Calculate distribution of total number of mitochondria
     ksx = ksh * Kmh * gluc_new ./ (Kmh + gluc_new);
@@ -161,6 +165,7 @@ while (normdtg > dtcutoff)
         hold all
         plot(xpos,gluc,'b.-')        
 %         plot(xpos,Tmito(2:end-1)*initglucint,'r.-')
+    title(sprintf('Step %d, normdtg= %f',step,normdtg))
         hold off
         drawnow
     end
