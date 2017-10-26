@@ -33,6 +33,7 @@ options.L = 500;
 options.gpts = 200;
 options.nstep = 1e5;
 options.dttol = 1e-3;
+%%
 [gluc,Tmito,Smito,Smito_int,normdtg,gluc_init,opt,xpos,lmdh,ftc] = runiterativesims(options);
 
 varmito = var(xpos,Tmito);

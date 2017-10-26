@@ -129,12 +129,15 @@ while (normdtg > dtcutoff)
     end
     
     if (opt.dodisplay && mod(step,opt.showevery)==0)
-        
+        var_mito= var(xpos,Tmito) ; %variance in mitochondria position distribution;
+        varmetric = 6*var_mito/options.L^2 - 0.5;
+
         plot(xpos,gluc_init,'k--')
         hold all
         plot(xpos,gluc,'b.-')        
-        plot(xpos,Tmito*initglucint,'r.-')
+        plot(xpos,Tmito*Lh/2,'r.-')
         hold off
+        title(sprintf('Step %d, dtg: %f, varmetric: %f',step,normdtg,varmetric))
         drawnow
     end
     Gstat = gluc;

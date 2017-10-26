@@ -53,16 +53,16 @@ end
 
 % plot
 ll = logspace(-2,-1);
-loglog(lambda_hat,c0cutoffU, 'b', lambda_hat,c0cutoffL,'b','LineWidth',2)%,ll,1./ll.^3,ll,50./ll.^2,ll,30./ll)
+loglog(lambda_hat,c0cutoffU, 'r', lambda_hat,c0cutoffL,'r','LineWidth',2)%,ll,1./ll.^3,ll,50./ll.^2,ll,30./ll)
 xlim([1e-2,1])
 %
 %loglog(lambda_hat,c0cutoff(:,A2_ind),lambda_hat,0.07./lambda_hat.^2)
 xlabel('lambda hat')
 ylabel(sprintf('conc to get %f cutoff',cutoff))
 
-hold all
-loglog(10.^loglamfrac,c0list,'k','LineWidth',2)
-hold off
+%hold all
+%loglog(10.^loglamfrac,c0list,'k','LineWidth',2)
+%hold off
 % -------------
 %% discrete sims for different variance metrics (what variance metric is reasonable to use?)
 % generated with Anamika/work20170809.m

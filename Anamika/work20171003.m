@@ -79,7 +79,7 @@ for i = 1:1:length(lambda_hat)
 end
 
 
-% (lower end)
+%% (lower end)
 c0vals = logspace(c0_llim,c0_ulim,nc0);
 for i = 1:1:length(lambda_hat)
     [M,I] = max(varmetric(i,:)');
@@ -96,7 +96,7 @@ end
 % 
 % c0cutoffLplot(ncL(2)+1:nl) = 0;
 % c0cutoffLplot(1:ncL(2)) = c0cutoffL(1,:);
-figure(2);
+%figure(2);
 ll = logspace(-2,-1);
 %loglog(lambda_hat,c0cutoffU,'r',lambda_hat,c0cutoffL, 'r','LineWidth',2)%,ll,1./ll.^3,ll,50./ll.^2,ll,30./ll)
 loglog(lambda_hat,c0cutoffU,'r','LineWidth',2)%,ll,1./ll.^3,ll,50./ll.^2,ll,30./ll)
