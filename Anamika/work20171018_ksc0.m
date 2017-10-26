@@ -59,3 +59,84 @@ date = datestr(datetime('today'),formatOut);
 %save workspace with today's date'
 filename = strcat('workspace_',date,'perm_ks_c0_05');
 save (filename);
+
+%% plot variance metric
+varmetric = 6*var_mito/options.L^2 - 0.5;
+colormap jet;
+pcolor(log10(c0list),log10(lambda_hat),varmetric); shading flat
+xlabel('log10(c0)')
+ylabel('log10(lambda-hat)')
+title('varmetric for ks = 100')
+%% look at conc necessary to achieve variance cutoff 
+% upper end
+clear c0cutoffU c0cutoffL
+cutoff = 0.15;
+c0vals = logspace(c0_llim,c0_ulim,nc0);
+for i = 1:1:length(lambda_hat)
+    [M,I] = max(varmetric(i,:)');
+    if (M<cutoff || varmetric(i,end)>cutoff)
+        c0cutoffU(i) = NaN;
+    else
+        c0cutoffU(i) = interp1(varmetric(i,I:end),c0vals(I:end),cutoff);
+    end
+end
+
+
+% (lower end)
+c0vals = logspace(c0_llim,c0_ulim,nc0);
+for i = 1:1:length(lambda_hat)
+    [M,I] = max(varmetric(i,:)');
+    if (M<cutoff || varmetric(i,end)>cutoff)
+        c0cutoffL(i) = NaN;
+    else
+        c0cutoffL(i) = interp1(varmetric(i,1:I),c0vals(1:I),cutoff);
+    end
+end
+
+
+% plot
+figure()
+ll = logspace(-2,-1);
+loglog(lambda_hat,c0cutoffU, 'r', lambda_hat,c0cutoffL,'r','LineWidth',2)%,ll,1./ll.^3,ll,50./ll.^2,ll,30./ll)
+xlim([1e-2,1])
+hold all
+%
+%loglog(lambda_hat,c0cutoff(:,A2_ind),lambda_hat,0.07./lambda_hat.^2)
+xlabel('lambda hat')
+ylabel(sprintf('conc to get %f cutoff',cutoff))
+
+hold off
+
+%% compare with high ks limit
+figure()
+ll = logspace(-2,-1);
+loglog(lambda_hat,c0cutoffU, 'r', lambda_hat,c0cutoffL,'r','LineWidth',2)%,ll,1./ll.^3,ll,50./ll.^2,ll,30./ll)
+xlim([1e-2,1])
+hold all
+%
+%loglog(lambda_hat,c0cutoff(:,A2_ind),lambda_hat,0.07./lambda_hat.^2)
+xlabel('lambda hat')
+ylabel(sprintf('conc to get %f cutoff',cutoff))
+hold on;
+
+
+% upper end
+clear 
+load('workspace_20171012gstat2.mat');
+clear c0cutoffU c0cutoffL
+cutoff = 0.15;
+c0vals = logspace(c0_llim,c0_ulim,nc0);
+for i = 1:1:length(lambda_hat)
+    [M,I] = max(varmetric(i,:)');
+    if (M<cutoff || varmetric(i,end)>cutoff)
+        c0cutoffU(i) = NaN;
+    else
+        c0cutoffU(i) = interp1(varmetric(i,I:end),c0vals(I:end),cutoff);
+    end
+end
+
+ll = logspace(-2,-1);
+loglog(lambda_hat,c0cutoffU, 'g','LineWidth',2)%,ll,1./ll.^3,ll,50./ll.^2,ll,30./ll)
+xlim([1e-2,1])
+hold all
+
