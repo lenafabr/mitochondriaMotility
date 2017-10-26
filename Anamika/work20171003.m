@@ -12,7 +12,7 @@ c0_llim = -3;
 c0_ulim = 2;
 nc0 = 102;
 options.gpts = 100;
-options.nmito = 500;
+options.nmito = 70;
 options.L = 500;
 options.msize = 1;
 options.D = 140;
@@ -20,6 +20,7 @@ options.dodisplay = 0;
 options.nmito = 100;
 options.dttol = 1e-3;
 options.nsteps = 1e4;
+
 
 
 %run the function
