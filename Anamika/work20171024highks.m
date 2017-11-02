@@ -19,7 +19,7 @@ options.msize = 1;
 options.D = 140;
 options.dodisplay = 0;
 options.dttol = 1e-2;
-options.nsteps = 1e4;
+options.nstep = 1e6;
 
 
 
