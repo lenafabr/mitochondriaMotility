@@ -60,6 +60,7 @@ ksh = opt.ks/opt.kw*opt.c0;
 Dh = opt.D/opt.msize^2/opt.kw;
 kgh = opt.kg/opt.kw;
 Kmh = opt.Km/opt.c0;
+Ph = opt.P * opt.msize / opt.vel;
 
 % spatial resolution
 dx = Lh/(opt.gpts - 1);
@@ -109,7 +110,7 @@ while (normdtg > dtcutoff)
     %Calculate the change in glucose concentration
     d2g(2:end-1) = (gluc(3:end)+gluc(1:end-2) - 2*gluc(2:end-1))/dx^2; %space double derivative
     % time derivative of glucose
-    dtg(2:end-1) = Dh*d2g(2:end-1) - (kgh * Kmh * opt.nmito * opt.msize) * (gluc(2:end-1) .* Tmito(2:end-1)) ./ (Kmh + gluc(2:end-1)) + (opt.P*(Cx(2:end-1) - gluc(2:end-1)));
+    dtg(2:end-1) = Dh*d2g(2:end-1) - (kgh * Kmh * opt.nmito * opt.msize) * (gluc(2:end-1) .* Tmito(2:end-1)) ./ (Kmh + gluc(2:end-1)) + (Ph*(Cx(2:end-1) - gluc(2:end-1)));
     normdtg = norm(dtg);
     gluc = gluc+dtg*opt.delt;
     %implement reflecting boundary condition - is this implementation
