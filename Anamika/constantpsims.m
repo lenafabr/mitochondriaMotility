@@ -43,6 +43,9 @@ opt.showevery = 1;
 
 opt.restart = 1; % flag to enable continuing previous sims
 
+%Permeability term
+opt.P = 0.1;
+
 % copy over supplied options to replace the defaults
 if (exist('options')==1)
     opt = copyStruct(options, opt);
@@ -59,9 +62,9 @@ ksh = opt.ks/opt.vel*opt.c0*opt.msize;
 Dh = opt.D/opt.msize/opt.vel;
 kgh = opt.kg*opt.msize/opt.vel;
 Kmh = opt.Km/opt.c0;
+Ph = opt.P * opt.msize / opt.vel;
 
-%Permeability term
-opt.P = 0.1;
+
 
 % spatial resolution
 dx = Lh/(opt.gpts - 1);
@@ -104,7 +107,7 @@ while (normdtg > dtcutoff)
     %Calculate the change in glucose concentration
     d2g(2:end-1) = (gluc(3:end)+gluc(1:end-2) - 2*gluc(2:end-1))/dx^2; %space double derivative
     % time derivative of glucose
-    dtg(2:end-1) = Dh*d2g(2:end-1) - (kgh * Kmh * opt.nmito * opt.msize) * (gluc(2:end-1) .* Tmito(2:end-1)) ./ (Kmh + gluc(2:end-1)) + (opt.P*(Cx(2:end-1) - gluc(2:end-1)));
+    dtg(2:end-1) = Dh*d2g(2:end-1) - (kgh * Kmh * opt.nmito * opt.msize) * (gluc(2:end-1) .* Tmito(2:end-1)) ./ (Kmh + gluc(2:end-1)) + (Ph*(Cx(2:end-1) - gluc(2:end-1)));
     normdtg = norm(dtg);
     gluc = gluc+dtg*opt.delt;
     %implement reflecting boundary condition - is this implementation
