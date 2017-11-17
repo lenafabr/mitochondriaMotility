@@ -6,7 +6,6 @@ opt = struct();
 opt.msize = 1; % mitochondria size
 
 opt.L = 500; % domain size
-opt.vel = 1; % mitochondria velocity
 opt.D = 140;% glucose diffusion coefficient
 opt.kw = 1; % rate of starting a walk
 opt.ks = 1; % rate of stopping is ks*[gluc]
@@ -43,6 +42,9 @@ opt.showevery = 1;
 
 opt.restart = 1; % flag to enable continuing previous sims
 
+%Permeability term
+opt.P = 0.1;
+
 % copy over supplied options to replace the defaults
 if (exist('options')==1)
     opt = copyStruct(options, opt);
@@ -53,34 +55,37 @@ opt.f = opt.nmito * opt.msize / opt.L;
 % set up dimensionless parameters
 
 Lh = opt.L/opt.msize;
-velh = 1;
-kwh = opt.kw/opt.vel*opt.msize;
-ksh = opt.ks/opt.vel*opt.c0*opt.msize;
-Dh = opt.D/opt.msize/opt.vel;
-kgh = opt.kg*opt.msize/opt.vel;
+kwh = 1;
+ksh = opt.ks/opt.kw*opt.c0;
+Dh = opt.D/opt.msize^2/opt.kw;
+kgh = opt.kg/opt.kw;
 Kmh = opt.Km/opt.c0;
-
-%Permeability term
-opt.P = 0.1;
 
 % spatial resolution
 dx = Lh/(opt.gpts - 1);
 
 %% Initialize start glucose concentration with analytical solution
 %Analytical solution obtained by assuming uniform distribution of
-%mitochondria - should I use some other assumption?
+%mitochondria 
 
-% spatial positions at which glucose is evaluated
-% index 1 = point on domain edge
 xpos = linspace(0,Lh,opt.gpts)';
-lmdh = sqrt(Dh./(kgh*opt.nmito*Lh)); %lambda-hat
-gluc_init =  cosh((xpos-Lh/2)./(Lh * lmdh)) ./ cosh(0.5/lmdh);
-gluc = gluc_init;
-d2g = zeros(opt.gpts,1);
-dtg = zeros(opt.gpts,1);
+
+
 %define external glucose profile, nondimensionalized by c0
 C_out = ((opt.cend - opt.c0) * (xpos - Lh/2) / Lh) + (opt.cend + opt.c0)/2;
 Cx = C_out / opt.c0;
+
+% spatial positions at which glucose is evaluated
+% index 1 = point on domain edge
+lmdh = sqrt(Dh./(kgh*opt.nmito*Lh+opt.P*Lh^2)); %lambda-hat
+%gluc_init =  cosh((xpos-Lh/2)./(Lh * lmdh)) ./ cosh(0.5/lmdh);
+keff = Dh/(lmdh*Lh)^2;
+gluc_init = opt.P/keff*Cx - ...
+    opt.P*(opt.cend - opt.c0)/opt.c0 * lmdh/keff/cosh(1/lmdh/2)*sinh((xpos-Lh/2)/Lh/lmdh);
+gluc = gluc_init;
+d2g = zeros(opt.gpts,1);
+dtg = zeros(opt.gpts,1);
+
 
 ftc = 0; %flag for failing to converge. Is 1 when fails to converge. 
 normdtg = inf;
@@ -131,10 +136,16 @@ while (normdtg > dtcutoff)
         hold all
         plot(xpos,gluc,'b.-')
         plot(xpos,Cx,'g--')
-        plot(xpos,Tmito*initglucint,'r.-')
+        %plot(xpos,Tmito*initglucint,'r.-')
+        plot(xpos,Tmito*100,'r.-')
+        title(sprintf('Step %d; ndtg %f',step,normdtg))        
         hold off
         drawnow
     end
 end
+
+% reset glucose concentrations back to real units
+gluc = gluc*opt.c0;
+gluc_init = gluc_init*opt.c0;
 end
  
