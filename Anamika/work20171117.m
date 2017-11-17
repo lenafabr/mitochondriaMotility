@@ -7,7 +7,7 @@ options.vel = 1; % mitochondria velocity
 options.D = 140;% glucose diffusion coefficient
 options.kw = 1; % rate of starting a walk
 options.ks = 1; % rate of stopping is ks*[gluc]
-options.kg = 0.1; % rate of glucose consumption (if linear) 
+options.kg = 100; % rate of glucose consumption (if linear) 
 options.Km = 10; %linear regime
 options.nmito = 70; % number of mitochondria
 options.gpts = 100; % number of discrete spatial points for evaluating gluc concentration
@@ -67,8 +67,8 @@ dx = Lh/(options.gpts - 1);
 [gluc,Tmito,Smito,Smito_int,normdtg,gluc_init,opt,xpos,lmdh,ftc] = constantpsims(options);
 
 kh = kgh * opt.nmito * opt.msize / Lh;
-a = (Ph / kh+Ph) * (options.cend-options.c0)/(Lh * options.c0);
-b = (Ph / kh+Ph) * (options.cend+options.c0)/(2 * options.c0);
+a = Ph / (kh+Ph) * (options.cend-options.c0)/(Lh );
+b = Ph / (kh+Ph) * (options.cend+options.c0)/(2);
 Beta = sqrt(kh+Ph/Dh);
 A = a / (2* cosh(Beta*Lh/2));
 gluc_calc = A*exp(-Beta * (xpos-Lh/2)) - A*exp(-Beta * (xpos - Lh/2)) + a*(xpos-Lh/2) + b;
@@ -76,7 +76,7 @@ gluc_calc = A*exp(-Beta * (xpos-Lh/2)) - A*exp(-Beta * (xpos - Lh/2)) + a*(xpos-
 plot(xpos,gluc,'r');
 hold on;
 plot(xpos,gluc_calc,'b');
-
+hold off
 
 %% Then plug in values from the dataset in the exptl paper
 

@@ -60,7 +60,7 @@ ksh = opt.ks/opt.kw*opt.c0;
 Dh = opt.D/opt.msize^2/opt.kw;
 kgh = opt.kg/opt.kw;
 Kmh = opt.Km/opt.c0;
-Ph = opt.P * opt.msize / opt.vel;
+Ph = opt.P /opt.kw;
 
 % spatial resolution
 dx = Lh/(opt.gpts - 1);
