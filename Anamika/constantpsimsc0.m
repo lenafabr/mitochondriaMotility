@@ -1,6 +1,6 @@
 % code to simulate constant permeability case
 %constant permeability appears as a sink term in the diffusion equation
-function [gluc,Tmito,Smito,Smito_int,normdtg,gluc_init,opt,xpos,lmdh,ftc] = constantpsims(options)
+function [gluc,Tmito,Smito,Smito_int,normdtg,gluc_init,opt,xpos,lmdh,ftc] = constantpsimsc0(options)
 %% set up default simulation parameters
 opt = struct();
 opt.msize = 1; % mitochondria size
@@ -26,9 +26,13 @@ opt.nstep = 1e5; % number of steps to run
 %default is linear external glucose profile
 opt.c0 = 1;
 opt.cend = 0.1; 
-%Permeability term
-opt.P = 0.1;
-opt.f = opt.nmito * opt.msize / opt.L;
+
+% starting position of mitochondria
+% default (<0) means start uniformly
+opt.startpos = -1;
+% prob mitochondria start in walking state
+% default is use equilibrium probability at c0 conc
+opt.pstartwalk = opt.kw/(opt.kw + opt.ks*opt.c0);
 
 % tolerance for "small time derivative"
 opt.dttol = 1e-4;
@@ -36,26 +40,34 @@ opt.dttol = 1e-4;
 % displaying plots
 opt.dodisplay = 1;
 opt.showevery = 1;
+
 opt.restart = 1; % flag to enable continuing previous sims
 
-% set up dimensionless parameters
-Lh = opt.L/opt.msize;
-velh = 1;
-kwh = opt.kw/opt.vel*opt.msize;
-ksh = opt.ks/opt.vel*opt.Km*opt.msize;
-Dh = opt.D/opt.msize/opt.vel;
-kgh = opt.kg*opt.msize/opt.vel;
-c0h = opt.c0/opt.Km;
-cendh = opt.cend/opt.Km;
-Ph = opt.P * opt.msize / opt.vel;
-
-% spatial resolution
-dx = Lh/(opt.gpts - 1);
+%Permeability term
+opt.P = 0.1;
 
 % copy over supplied options to replace the defaults
 if (exist('options')==1)
     opt = copyStruct(options, opt);
 end
+
+opt.f = opt.nmito * opt.msize / opt.L;
+
+% set up dimensionless parameters
+
+Lh = opt.L/opt.msize;
+velh = 1;
+kwh = opt.kw/opt.vel*opt.msize;
+ksh = opt.ks/opt.vel*opt.c0*opt.msize;
+Dh = opt.D/opt.msize/opt.vel;
+kgh = opt.kg*opt.msize/opt.vel;
+Kmh = opt.Km/opt.c0;
+Ph = opt.P * opt.msize / opt.vel;
+
+
+
+% spatial resolution
+dx = Lh/(opt.gpts - 1);
 
 %% Initialize start glucose concentration with analytical solution
 %Analytical solution obtained by assuming uniform distribution of
@@ -69,12 +81,13 @@ gluc_init =  cosh((xpos-Lh/2)./(Lh * lmdh)) ./ cosh(0.5/lmdh);
 gluc = gluc_init;
 d2g = zeros(opt.gpts,1);
 dtg = zeros(opt.gpts,1);
-%define external glucose profile (nondimensionalized)
-C_out = ((cendh - c0h) * (xpos - Lh/2) / Lh) + (cendh + c0h)/2;
+%define external glucose profile, nondimensionalized by c0
+C_out = ((opt.cend - opt.c0) * (xpos - Lh/2) / Lh) + (opt.cend + opt.c0)/2;
+Cx = C_out / opt.c0;
 
 ftc = 0; %flag for failing to converge. Is 1 when fails to converge. 
 normdtg = inf;
-dtcutoff = opt.dttol*(kgh*opt.Km/(opt.Km+1));
+dtcutoff = opt.dttol*(kgh*Kmh/(Kmh+1));
 spacing = Lh/opt.gpts; %integration spacing
 initglucint = spacing * trapz(gluc_init);
 
@@ -83,8 +96,9 @@ initglucint = spacing * trapz(gluc_init);
 %steady state condition set by time derivative being small enough
 step = 0;
 while (normdtg > dtcutoff)
+    
     %Calculate distribution of total number of mitochondria
-    ksx = ksh * opt.Km * gluc ./ (opt.Km + gluc);
+    ksx = ksh * Kmh * gluc ./ (Kmh + gluc);
     ksx_int = spacing * trapz(ksx);
     Tmito = (ksx/kwh + 1) ./ (Lh + (ksx_int/kwh));
     Smito = (ksx/kwh) ./ (Lh + (ksx_int/kwh));
@@ -93,7 +107,7 @@ while (normdtg > dtcutoff)
     %Calculate the change in glucose concentration
     d2g(2:end-1) = (gluc(3:end)+gluc(1:end-2) - 2*gluc(2:end-1))/dx^2; %space double derivative
     % time derivative of glucose
-    dtg(2:end-1) = Dh*d2g(2:end-1) - (kgh * opt.Km * opt.nmito * opt.msize) * (gluc(2:end-1) .* Tmito(2:end-1)) ./ (opt.Km + gluc(2:end-1)) + (Ph*(C_out(2:end-1) - gluc(2:end-1)));
+    dtg(2:end-1) = Dh*d2g(2:end-1) - (kgh * Kmh * opt.nmito * opt.msize) * (gluc(2:end-1) .* Tmito(2:end-1)) ./ (Kmh + gluc(2:end-1)) + (Ph*(Cx(2:end-1) - gluc(2:end-1)));
     normdtg = norm(dtg);
     gluc = gluc+dtg*opt.delt;
     %implement reflecting boundary condition - is this implementation
@@ -119,7 +133,7 @@ while (normdtg > dtcutoff)
         plot(xpos,gluc_init,'k--')
         hold all
         plot(xpos,gluc,'b.-')
-        plot(xpos,C_out,'g--')
+        plot(xpos,Cx,'g--')
         plot(xpos,Tmito*initglucint,'r.-')
         hold off
         drawnow

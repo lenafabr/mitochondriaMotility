@@ -1,4 +1,4 @@
-function [gluc,Tmito,Smito,Smito_int,normdtg,gluc_init,opt,xpos,lmdh,ftc] = permeablesims(options)
+function [gluc,Tmito,Smito,Smito_int,normdtg,gluc_init,opt,xpos,lmdh,ftc] = permeablesimsc0(options)
 %% set up default simulation parameters
 opt = struct();
 
@@ -23,7 +23,7 @@ opt.delt = 1e-3; % time-step
 opt.nstep = 1e5; % number of steps to run
 
 opt.P = 0.1; %permeability
-opt.f = opt.nmito * opt.msize / opt.L;
+
 % tolerance for "small time derivative"
 opt.dttol = 1e-3;
 
@@ -38,16 +38,16 @@ if (exist('options')==1)
     opt = copyStruct(options, opt);
 end
 
+opt.f = opt.nmito * opt.msize / opt.L;
 % set up dimensionless parameters
 
 Lh = opt.L/opt.msize;
 velh = 1;
 kwh = opt.kw/opt.vel*opt.msize;
-ksh = opt.ks/opt.vel*opt.Km*opt.msize;
+ksh = opt.ks/opt.vel*opt.c0*opt.msize;
 Dh = opt.D/opt.msize/opt.vel;
 kgh = opt.kg*opt.msize/opt.vel;
-c0h = opt.c0/opt.Km;
-Ph = opt.P * opt.msize / opt.vel;
+Kmh = opt.Km/opt.c0;
 
 % spatial resolution
 dx = Lh/(opt.gpts - 1);
@@ -65,7 +65,7 @@ if (~isempty(opt.startgluc))
     gluc_init = opt.startgluc;
 else
     lmdh = sqrt(Dh./(kgh*opt.nmito*Lh)); %lambda-hat
-    gluc_init =  c0h * cosh((xpos-Lh/2)./(Lh * lmdh)) ./ cosh(0.5/lmdh);
+    gluc_init =  cosh((xpos-Lh/2)./(Lh * lmdh)) ./ cosh(0.5/lmdh);
 end
 gluc = gluc_init;
 d2g = zeros(opt.gpts+2,1); %increased size to cater for new end points
@@ -75,10 +75,30 @@ gluc_new = zeros(opt.gpts+2,1);
 Smito = zeros(opt.gpts+2,1);
 ksx = zeros(opt.gpts+2,1);
 
+% d2g(2:end-1) = (gluc(3:end)+gluc(1:end-2) - 2*gluc(2:end-1))/dx^2; %space double derivative
+%dtg(1) = 0;
+%dtg(end) = 0; %fixed boundary conditions
+% dtg(2:end-1) = Dh*d2g(2:end-1);
+% dtg_init = dtg;
 ftc = 0; %flag for failing to converge. Is 1 when fails to converge. 
+
+
+
 normdtg = inf;
-dtcutoff = opt.dttol;%*(kgh*opt.Km/(opt.Km+1));
+
+dtcutoff = opt.dttol;%*(kgh*Kmh/(Kmh+1));
 spacing = dx; %integration spacing
+
+initglucint = spacing * trapz(gluc_init);
+
+
+gluc_start = gluc(2) + (2*opt.P*(opt.c0 - gluc(1))*dx / Dh);
+gluc_end = gluc(opt.gpts-1) + (2*opt.P*(opt.c0 - gluc(opt.gpts))*dx / Dh);
+
+%define gluc_new to be the new glucose vector to work with
+gluc_new(1) = gluc_start;
+gluc_new(2:opt.gpts+1) = gluc;
+gluc_new(opt.gpts+2) = gluc_end;
 
 %% Iterative process
 %continues till steady state
@@ -87,14 +107,14 @@ step = 0;
 while (normdtg > dtcutoff)
     %define glucose concentrations before x0 and after xL
     %to fix derivatives in terms of permeability at the edges
-    gluc_start = gluc(2) + (2*Ph*(c0h - gluc(1))*dx / Dh);
-    gluc_end = gluc(opt.gpts-1) + (2*Ph*(c0h - gluc(opt.gpts))*dx / Dh);
+    gluc_start = gluc(2) + (2*opt.P*(opt.c0 - gluc(1))*dx / Dh);
+    gluc_end = gluc(opt.gpts-1) + (2*opt.P*(opt.c0 - gluc(opt.gpts))*dx / Dh);
     
     %define gluc_new to be the new glucose vector to work with
     gluc_new = [gluc_start; gluc; gluc_end];    
 
     %Calculate distribution of total number of mitochondria
-    ksx = ksh * opt.Km * gluc_new ./ (opt.Km + gluc_new);
+    ksx = ksh * Kmh * gluc_new ./ (Kmh + gluc_new);
     ksx_int = spacing * trapz(ksx);
     Tmito = (ksx/kwh + 1) ./ (Lh + (ksx_int/kwh));
     Smito = (ksx/kwh) ./ (Lh + (ksx_int/kwh));
@@ -103,7 +123,7 @@ while (normdtg > dtcutoff)
     %Calculate the change in glucose concentration
     d2g(2:end-1) = (gluc_new(3:end)+gluc_new(1:end-2) - 2*gluc_new(2:end-1))/dx^2; %space double derivative
     % time derivative of glucose
-    dtg(2:end-1) = Dh*d2g(2:end-1) - (kgh * opt.Km * opt.nmito * opt.msize) * (gluc_new(2:end-1) .* Tmito(2:end-1)) ./ (opt.Km + gluc_new(2:end-1));
+    dtg(2:end-1) = Dh*d2g(2:end-1) - (kgh * Kmh * opt.nmito * opt.msize) * (gluc_new(2:end-1) .* Tmito(2:end-1)) ./ (Kmh + gluc_new(2:end-1));
     normdtg = norm(dtg);
     gluc_new = gluc_new+dtg*opt.delt;
        
@@ -125,7 +145,7 @@ while (normdtg > dtcutoff)
         plot(xpos,gluc_init,'r.-')
         hold all
         plot(xpos,gluc,'b.-')        
-        plot(xpos,Tmito(2:end-1)*100,'r.-')
+%         plot(xpos,Tmito(2:end-1)*initglucint,'r.-')
     title(sprintf('Step %d, normdtg= %f',step,normdtg))
         hold off
         drawnow

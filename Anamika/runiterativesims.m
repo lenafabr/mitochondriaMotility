@@ -24,19 +24,29 @@ opt.delt = 1e-4; % time-step
 opt.nstep = 1000; % number of steps to run
 
 
+opt.f = opt.nmito * opt.msize / opt.L;
+% set up dimensionless parameters
+%non-dimensionalize by Km instead of c0
+Lh = opt.L/opt.msize;
+velh = 1;
+kwh = opt.kw/opt.vel*opt.msize;
+ksh = opt.ks/opt.vel*opt.Km*opt.msize;
+Dh = opt.D/opt.msize/opt.vel;
+kgh = opt.kg*opt.msize/opt.vel;
+c0h = opt.c0/opt.Km;
+
+% spatial resolution
+dx = Lh/(opt.gpts - 1);
 
 % boundary conditions on the far size
 % positive = fixed concentration at the boundary
 % negative = reflecting boundary
-opt.cend = 1; 
+opt.cend = 1;
+cendh = opt.cend/opt.Km;
 
 % starting position of mitochondria
 % default (<0) means start uniformly
 opt.startpos = -1;
-% prob mitochondria start in walking state
-% default is use equilibrium probability at c0 conc
-opt.pstartwalk = opt.kw/(opt.kw + opt.ks*opt.c0);
-
 % tolerance for "small time derivative"
 opt.dttol = 1e-4;
 
@@ -51,25 +61,6 @@ if (exist('options')==1)
     opt = copyStruct(options, opt);
 end
 
-opt.f = opt.nmito * opt.msize / opt.L;
-
-% set up dimensionless parameters
-
-Lh = opt.L/opt.msize;
-% velh = opt.vel/opt.msize/opt.kg;
-% kwh = opt.kw/opt.kg;
-% ksh = opt.ks/opt.kg*opt.c0;
-% Dh = opt.D/opt.msize^2/opt.kg;
-velh = 1;
-kwh = opt.kw/opt.vel*opt.msize;
-ksh = opt.ks/opt.vel*opt.c0*opt.msize;
-Dh = opt.D/opt.msize/opt.vel;
-kgh = opt.kg*opt.msize/opt.vel;
-Kmh = opt.Km/opt.c0;
-
-% spatial resolution
-dx = Lh/(opt.gpts - 1);
-
 %% Initialize start glucose concentration with analytical solution
 %Analytical solution obtained by assuming uniform distribution of
 %mitochondria
@@ -78,7 +69,7 @@ dx = Lh/(opt.gpts - 1);
 % index 1 = point on domain edge
 xpos = linspace(0,Lh,opt.gpts)';
 lmdh = sqrt(Dh./(kgh*opt.nmito*Lh)); %lambda-hat
-gluc_init =  cosh((xpos-Lh/2)./(Lh * lmdh)) ./ cosh(0.5/lmdh);
+gluc_init = c0h * cosh((xpos-Lh/2)./(Lh * lmdh)) ./ cosh(0.5/lmdh);
 gluc = gluc_init;
 d2g = zeros(opt.gpts,1);
 dtg = zeros(opt.gpts,1);
@@ -91,7 +82,7 @@ ftc = 0; %flag for failing to converge. Is 1 when fails to converge.
 
 normdtg = inf;
 
-dtcutoff = opt.dttol*(kgh*Kmh/(Kmh+1));
+dtcutoff = opt.dttol*(kgh*opt.Km/(opt.Km+1));
 spacing = Lh/opt.gpts; %integration spacing
 
 initglucint = spacing * trapz(gluc_init);
@@ -103,7 +94,7 @@ step = 0;
 while (normdtg > dtcutoff)
     
     %Calculate distribution of total number of mitochondria
-    ksx = ksh * Kmh * gluc ./ (Kmh + gluc);
+    ksx = ksh * opt.Km * gluc ./ (opt.Km + gluc);
     ksx_int = spacing * trapz(ksx);
     Tmito = (ksx/kwh + 1) ./ (Lh + (ksx_int/kwh));
     Smito = (ksx/kwh) ./ (Lh + (ksx_int/kwh));
@@ -112,7 +103,7 @@ while (normdtg > dtcutoff)
     %Calculate the change in glucose concentration
     d2g(2:end-1) = (gluc(3:end)+gluc(1:end-2) - 2*gluc(2:end-1))/dx^2; %space double derivative
     % time derivative of glucose
-    dtg(2:end-1) = Dh*d2g(2:end-1) - (kgh * Kmh * opt.nmito * opt.msize) * (gluc(2:end-1) .* Tmito(2:end-1)) ./ (Kmh + gluc(2:end-1));
+    dtg(2:end-1) = Dh*d2g(2:end-1) - (kgh * opt.Km * opt.nmito * opt.msize) * (gluc(2:end-1) .* Tmito(2:end-1)) ./ (opt.Km + gluc(2:end-1));
     normdtg = norm(dtg);
     gluc = gluc+dtg*opt.delt;
        
