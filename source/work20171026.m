@@ -38,3 +38,11 @@ var_mito_70=var_mito;
 
 load('workspace_20171019perm_l_c0.mat')
 var_mito_100=var_mito;
+
+%%
+varmetric = 6*var_mito_100/options.L^2 - 0.5;
+%%
+pcolor(log10(c0list),log10(lambda_hat),varmetric); shading flat
+xlabel('log10(c0)')
+ylabel('log10(lambda-hat)')
+colormap jet
