@@ -38,6 +38,11 @@ opt.dodisplay = 1;
 opt.showevery = 1;
 opt.restart = 1; % flag to enable continuing previous sims
 
+
+% copy over supplied options to replace the defaults
+if (exist('options')==1)
+    opt = copyStruct(options, opt);
+end
 % set up dimensionless parameters
 Lh = opt.L/opt.msize;
 velh = 1;
@@ -52,10 +57,6 @@ Ph = opt.P * opt.msize / opt.vel;
 % spatial resolution
 dx = Lh/(opt.gpts - 1);
 
-% copy over supplied options to replace the defaults
-if (exist('options')==1)
-    opt = copyStruct(options, opt);
-end
 
 %% Initialize start glucose concentration with analytical solution
 %Analytical solution obtained by assuming uniform distribution of
@@ -65,7 +66,7 @@ end
 % index 1 = point on domain edge
 xpos = linspace(0,Lh,opt.gpts)';
 lmdh = sqrt(Dh./(kgh*opt.nmito*Lh)); %lambda-hat
-gluc_init =  cosh((xpos-Lh/2)./(Lh * lmdh)) ./ cosh(0.5/lmdh);
+gluc_init = c0h *  cosh((xpos-Lh/2)./(Lh * lmdh)) ./ cosh(0.5/lmdh);
 gluc = gluc_init;
 d2g = zeros(opt.gpts,1);
 dtg = zeros(opt.gpts,1);

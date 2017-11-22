@@ -11,7 +11,6 @@ opt.vel = 1; % mitochondria velocity
 opt.D = 140;% glucose diffusion coefficient
 opt.kw = 1; % rate of starting a walk
 opt.ks = 1; % rate of stopping is ks*[gluc]
-opt.kg = 0.2; % rate of glucose consumption (if linear) 
 opt.Km = 1;
 
 % starting glucose distribution
@@ -21,22 +20,7 @@ opt.startgluc = [];
 opt.nmito = 1; % number of mitochondria
 opt.gpts = 100; % number of discrete spatial points for evaluating gluc concentration
 opt.delt = 1e-4; % time-step
-opt.nstep = 1000; % number of steps to run
-
-
-opt.f = opt.nmito * opt.msize / opt.L;
-% set up dimensionless parameters
-%non-dimensionalize by Km instead of c0
-Lh = opt.L/opt.msize;
-velh = 1;
-kwh = opt.kw/opt.vel*opt.msize;
-ksh = opt.ks/opt.vel*opt.Km*opt.msize;
-Dh = opt.D/opt.msize/opt.vel;
-kgh = opt.kg*opt.msize/opt.vel;
-c0h = opt.c0/opt.Km;
-
-% spatial resolution
-dx = Lh/(opt.gpts - 1);
+opt.nstep = 1e5; % number of steps to run
 
 % boundary conditions on the far size
 % positive = fixed concentration at the boundary
@@ -52,7 +36,7 @@ opt.dttol = 1e-4;
 
 % displaying plots
 opt.dodisplay = 1;
-opt.showevery = 1;
+opt.showevery = 1000;
 
 opt.restart = 1; % flag to enable continuing previous sims
 
@@ -60,6 +44,19 @@ opt.restart = 1; % flag to enable continuing previous sims
 if (exist('options')==1)
     opt = copyStruct(options, opt);
 end
+opt.f = opt.nmito * opt.msize / opt.L;
+% set up dimensionless parameters
+%non-dimensionalize by Km instead of c0
+Lh = opt.L/opt.msize;
+velh = 1;
+kwh = opt.kw/opt.vel*opt.msize;
+ksh = opt.ks/opt.vel*opt.Km*opt.msize;
+Dh = opt.D/opt.msize/opt.vel;
+kgh = opt.kg*opt.msize/opt.vel;
+c0h = opt.c0/opt.Km;
+
+% spatial resolution
+dx = Lh/(opt.gpts - 1);
 
 %% Initialize start glucose concentration with analytical solution
 %Analytical solution obtained by assuming uniform distribution of

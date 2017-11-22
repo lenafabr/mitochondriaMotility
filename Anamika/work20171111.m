@@ -4,14 +4,14 @@
 %some diffrent permeabilities and compare to the fixed concentration case; 
 %make sure it approaches the fixed conc as permeability gets high. 
 
-options.gpts = 100;
+options.gpts = 500;
 options.nmito = 70;
 options.L = 500;
 options.msize = 1;
 options.D = 140;
 options.dodisplay = 0;
 options.dttol = 1e-2;
-options.delt = 1e-3;
+options.delt = 1e-4;
 options.nstep = 1e6;
 options.c0 = 100;
 options.cend = options.c0;
@@ -33,7 +33,7 @@ for i = 1:1:size(Plist,2)-1
     varmetric(i) = 6*var_mito(i)/options.L^2 - 0.5;
 end
 options.P = Plist(end);
-options.delt = 1e-4;
+options.delt = 1e-5;
 [gluc,Tmito,Smito,Smito_int,normdtg,gluc_init,opt,xpos,lmdh,ftc] = permeablesims(options);
 ftc_matrix(end) = ftc;
 option_list(end) = opt;
@@ -48,24 +48,33 @@ varmetric(end) = 6*var_mito(i)/options.L^2 - 0.5;
 formatOut = 'yyyymmdd';
 date = datestr(datetime('today'),formatOut);
 %save workspace with today's date'
-filename = strcat('workspace_',date,'Prange_l_0_02');
+filename = strcat('workspace_',date,'Prange_l_0_02_gpts500');
 save (filename);
 
-%% compare glucose profiles to profiles with end perm and fixed boundaries no P
-%plot for different values of P
-figure
-load('workspace_20171113Prange_l_0_02.mat');
+%% Run the simulation with fixed boundary conditions 
+load('workspace_20171121Prange_l_0_02_gpts500.mat');
+clear gluc_all gluc Tmito
+lambda_hat = 0.02;
+options.c0 = 100;
+options.kg = options.D ./ (options.nmito * options.msize * options.L * (lambda_hat^2));
+[gluc,Tmito,Smito,Smito_int,normdtg,gluc_init,opt,xpos,lmdh,ftc] = runiterativesims(options);
+gluc_fixed = gluc;
 
+%% compare glucose profiles to profiles with end perm and fixed boundaries no P
+%NOT USING THE EARLIER SAVED WORKSPACE
+% load('workspace_08_09_1e6.mat');
+% lambda_hat_i = 13; %index associated with lambda_hat = 0.02
+% c0_i = 85; %index associated with c0 = 100;
+figure;
+plot(xpos,gluc_fixed,'r--');
+hold all;
+
+%plot for different values of P
+load('workspace_20171121Prange_l_0_02_gpts500.mat');
 plot(xpos,gluc_all)
+title(sprintf('Diff constant P and fixed BC'))
 hold all;
-clear;
-load('workspace_08_09_1e6.mat');
-lambda_hat_i = 13; %index associated with lambda_hat = 0.02
-c0_i = 85; %index associated with c0 = 100;
-plot(xpos,gluc_all(:,lambda_hat_i,c0_i,1),'r--');
-plot(xpos,gluc_all(:,lambda_hat_i,1,1),'r--');
-hold all;
-% clear;
-% 
+
+
 
 
