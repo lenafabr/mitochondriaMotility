@@ -25,8 +25,8 @@ kg_ulim = -1;
 kg_llim = 1;
 P_ulim = 3;
 P_llim = -3;
-nkg = 10;
-nP = 11;
+nkg = 101;
+nP = 102;
 kglist = logspace(kg_llim,kg_ulim,nkg);
 Plist = logspace(P_llim,P_ulim,nP);
 for i = 1:1:nkg
@@ -40,7 +40,7 @@ for i = 1:1:nkg
         gluc_all(:,i,j) = gluc;
         Tmito_all(:,i,j) = Tmito;
         Smito_all(:,i,j) = Smito;
-        Percent_complete = (i/nkg) * 100;
+        Percent_complete = (i/nkg) * 100 
     end
 end
 
