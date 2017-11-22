@@ -52,7 +52,7 @@ filename = strcat('workspace_',date,'Prange_l_0_02_gpts500');
 save (filename);
 
 %% Run the simulation with fixed boundary conditions 
-load('workspace_20171121Prange_l_0_02_gpts500.mat');
+load('workspace_20171121Prange_l_0_02.mat');
 clear gluc_all gluc Tmito
 lambda_hat = 0.02;
 options.c0 = 100;
@@ -65,15 +65,18 @@ gluc_fixed = gluc;
 % load('workspace_08_09_1e6.mat');
 % lambda_hat_i = 13; %index associated with lambda_hat = 0.02
 % c0_i = 85; %index associated with c0 = 100;
-figure;
-plot(xpos,gluc_fixed,'r--');
+%figure;
+plot(xpos,gluc_fixed,'k--','LineWidth',2);
 hold all;
 
 %plot for different values of P
-load('workspace_20171121Prange_l_0_02_gpts500.mat');
-plot(xpos,gluc_all)
+load('workspace_20171121Prange_l_0_02.mat','gluc_all');
+cmap = colormapinterp([0,0,1;1,0,0],size(gluc_all,2));
+for c = 1:size(gluc_all,2)
+    plot(xpos,gluc_all(:,c),'Color',cmap(c,:))
+end
 title(sprintf('Diff constant P and fixed BC'))
-hold all;
+hold off;
 
 
 

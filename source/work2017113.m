@@ -4,13 +4,13 @@ options.L = 500;
 options.Km = 1;
 options.c0=50;
 options.cend = 0;
-options.kg = 100;
-options.P = 0.1;
-options.ks = 1000;
-options.showevery=10;
+options.kg = 0.2;
+options.P = 2;
+options.ks = 100;
+options.showevery=1000;
 
-options.gpts=200;
-options.delt = 5e-3;
+options.gpts=100;
+options.delt = 1e-2;
 
 [gluc,Tmito,Smito,Smito_int,normdtg,gluc_init,opt,xpos,lmdh,ftc] = ...
     constantpsims(options);
