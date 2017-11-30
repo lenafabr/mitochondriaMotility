@@ -43,4 +43,10 @@ for i = 1:1:nkg
         Percent_complete = (i/nkg) * 100 
     end
 end
+%save the workspace
+formatOut = 'yyyymmdd';
+date = datestr(datetime('today'),formatOut);
+%save workspace with today's date'
+filename = strcat('workspace_',date,'p_kg_101_102');
+save (filename);
 
