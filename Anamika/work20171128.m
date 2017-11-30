@@ -7,11 +7,11 @@
 
 %% First plot permeability case
 load('workspace_20171128p_01_l_c0.mat')
-% pcolor(log10(c0list),log10(lambda_hat),varmetric(:,:)); shading flat
-% xlabel('log10(c0)')
-% ylabel('log10(lambda-hat)')
-% title(sprintf('P=%f',options.P))
-
+ pcolor(log10(c0list),log10(lambda_hat),varmetric(:,:)); shading flat
+ xlabel('log10(c0)')
+ ylabel('log10(lambda-hat)')
+ title(sprintf('P=%f',options.P))
+%%
 cutoff = 0.15;
 c0vals = logspace(c0_llim,c0_ulim,nc0);
 for i = 1:1:length(lambda_hat)
@@ -50,10 +50,11 @@ hold on;
 clear
 load('workspace_20171130fixedc0.mat')
 % figure
-% pcolor(log10(c0list),log10(lambda_hat),varmetric(:,:)); shading flat
-% xlabel('log10(c0)')
-% ylabel('log10(lambda-hat)')
-% title(sprintf('fixed c0'))
+ pcolor(log10(c0list),log10(lambda_hat),varmetric(:,:)); shading flat
+ xlabel('log10(c0)')
+ ylabel('log10(lambda-hat)')
+ title(sprintf('fixed c0'))
+ %%
 cutoff = 0.15;
 %figure
 c0vals = logspace(c0_llim,c0_ulim,nc0);

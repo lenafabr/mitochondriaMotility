@@ -1,6 +1,5 @@
-% view results for constant permeability, vs kg and P
-
-nkg = 63;
+load('workspace_20171124p_kg_101_102.mat')
+%% view results for constant permeability, vs kg and P
 
 enrichind = find(xpos<51);
 

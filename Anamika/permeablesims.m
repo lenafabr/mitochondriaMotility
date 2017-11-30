@@ -103,7 +103,7 @@ while (normdtg > dtcutoff)
     %Calculate the change in glucose concentration
     d2g(2:end-1) = (gluc_new(3:end)+gluc_new(1:end-2) - 2*gluc_new(2:end-1))/dx^2; %space double derivative
     % time derivative of glucose
-    dtg(2:end-1) = Dh*d2g(2:end-1) - (kgh * opt.Km * opt.nmito * opt.msize) * (gluc_new(2:end-1) .* Tmito(2:end-1)) ./ (opt.Km + gluc_new(2:end-1));
+    dtg(2:end-1) = Dh*d2g(2:end-1) - (kgh * opt.Km * opt.nmito) * (gluc_new(2:end-1) .* Tmito(2:end-1)) ./ (opt.Km + gluc_new(2:end-1));
     normdtg = norm(dtg);
     gluc_new = gluc_new+dtg*opt.delt;
        
@@ -122,10 +122,10 @@ while (normdtg > dtcutoff)
     
     if (opt.dodisplay && mod(step,opt.showevery)==0)
         figure(3)
-        plot(xpos,gluc_init,'r.-')
+        plot(xpos,gluc_init,'k--')
         hold all
         plot(xpos,gluc,'b.-')        
-        plot(xpos,Tmito(2:end-1)*100,'r.-')
+        plot(xpos,Tmito(2:end-1)*1000,'r.-')
     title(sprintf('Step %d, normdtg= %f',step,normdtg))
         hold off
         drawnow

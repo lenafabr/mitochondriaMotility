@@ -122,7 +122,7 @@ while (normdtg > dtcutoff)
         plot(xpos,gluc_init,'k--')
         hold all
         plot(xpos,gluc,'b.-')        
-        plot(xpos,Tmito*initglucint,'r.-')
+        plot(xpos,Tmito*1000,'r.-')
         hold off
         drawnow
     end
