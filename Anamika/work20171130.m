@@ -59,8 +59,8 @@ options.Km = 1;
 options.PKm = 30;
 options.nmito = 70; % number of mitochondria
 options.gpts = 100; % number of discrete spatial points for evaluating gluc concentration
-options.delt = 1e-4; % time-step
-options.nstep = 2*1e5; % number of steps to run
+options.delt = 1e-5; % time-step
+options.nstep = 3*1e5; % number of steps to run
 %default is linear external glucose profile
 options.c0 = 50; %Using exptl paper
 options.cend = 0.1; %Exptl
