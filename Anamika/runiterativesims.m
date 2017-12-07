@@ -64,8 +64,6 @@ kgh = opt.kg*opt.msize/opt.vel;
 kgh = opt.kg*tscale;
 c0h = opt.c0/opt.Km;
 c0h = opt.c0/cscale;
-Ph = opt.P * opt.msize / opt.vel;
-Ph = opt.P * tscale;
 % spatial resolution
 dx = Lh/(opt.gpts - 1);
 
