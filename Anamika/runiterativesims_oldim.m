@@ -1,4 +1,4 @@
-function [gluc,Tmito,Smito,Smito_int,normdtg,gluc_init,opt,xpos,lmdh,ftc] = runiterativesims(options)
+function [gluc,Tmito,Smito,Smito_int,normdtg,gluc_init,opt,xpos,lmdh,ftc] = runiterativesims_olddim(options)
 %% set up default simulation parameters
 opt = struct();
 
@@ -7,6 +7,7 @@ opt.c0 = 1; % fixed glucose concentration
 opt.msize = 1; % mitochondria size
 
 opt.L = 500; % domain size
+opt.vel = 1; % mitochondria velocity
 opt.D = 140;% glucose diffusion coefficient
 opt.kw = 1; % rate of starting a walk
 opt.ks = 1; % rate of stopping is ks*[gluc]
@@ -18,7 +19,7 @@ opt.startgluc = [];
 
 opt.nmito = 1; % number of mitochondria
 opt.gpts = 100; % number of discrete spatial points for evaluating gluc concentration
-opt.delt = 1e-7; % time-step
+opt.delt = 1e-4; % time-step
 opt.nstep = 1e5; % number of steps to run
 
 % boundary conditions on the far size
@@ -45,18 +46,14 @@ if (exist('options')==1)
 end
 opt.f = opt.nmito * opt.msize / opt.L;
 % set up dimensionless parameters
-%Nondimensionalize by L, L^2/D and Km
-tscale = (opt.L)^2 / opt.D;
-lscale = opt.L;
-cscale = opt.Km;
-
-Lh = opt.L/lscale;
-kwh = opt.kw*tscale;
-ksh = opt.ks*cscale*tscale;
-Dh = opt.D*tscale/lscale^2;
-kgh = opt.kg*tscale;
-c0h = opt.c0/cscale;
-msizeh = opt.msize/lscale;
+%non-dimensionalize by Km instead of c0
+Lh = opt.L/opt.msize
+velh = 1;
+kwh = opt.kw/opt.vel*opt.msize
+ksh = opt.ks/opt.vel*opt.Km*opt.msize
+Dh = opt.D/opt.msize/opt.vel
+kgh = opt.kg*opt.msize/opt.vel
+c0h = opt.c0/opt.Km
 
 % spatial resolution
 dx = Lh/(opt.gpts - 1);
@@ -68,12 +65,8 @@ dx = Lh/(opt.gpts - 1);
 % spatial positions at which glucose is evaluated
 % index 1 = point on domain edge
 xpos = linspace(0,Lh,opt.gpts)';
-lmdh = sqrt(Dh./(kgh*opt.nmito*msizeh*Lh)); %lambda-hat
-if (~isempty(opt.startgluc))
-    gluc_init=opt.startgluc;
-else
-    gluc_init = c0h * cosh((xpos-Lh/2)./(Lh * lmdh)) ./ cosh(0.5/lmdh);
-end
+lmdh = sqrt(Dh./(kgh*opt.nmito*Lh)); %lambda-hat
+gluc_init = c0h * cosh((xpos-Lh/2)./(Lh * lmdh)) ./ cosh(0.5/lmdh);
 gluc = gluc_init;
 d2g = zeros(opt.gpts,1);
 dtg = zeros(opt.gpts,1);
@@ -86,7 +79,7 @@ ftc = 0; %flag for failing to converge. Is 1 when fails to converge.
 
 normdtg = inf;
 
-dtcutoff = opt.dttol;
+dtcutoff = opt.dttol*(kgh*opt.Km/(opt.Km+1));
 spacing = Lh/opt.gpts; %integration spacing
 
 initglucint = spacing * trapz(gluc_init);
@@ -107,7 +100,7 @@ while (normdtg > dtcutoff)
     %Calculate the change in glucose concentration
     d2g(2:end-1) = (gluc(3:end)+gluc(1:end-2) - 2*gluc(2:end-1))/dx^2; %space double derivative
     % time derivative of glucose
-    dtg(2:end-1) = Dh*d2g(2:end-1) - (kgh * opt.nmito * msizeh) * (gluc(2:end-1) .* Tmito(2:end-1)) ./ (1 + gluc(2:end-1));
+    dtg(2:end-1) = Dh*d2g(2:end-1) - (kgh * opt.Km * opt.nmito * opt.msize) * (gluc(2:end-1) .* Tmito(2:end-1)) ./ (opt.Km + gluc(2:end-1));
     normdtg = norm(dtg);
     gluc = gluc+dtg*opt.delt;
        
@@ -131,11 +124,8 @@ while (normdtg > dtcutoff)
         plot(xpos,gluc,'b.-')        
         plot(xpos,Tmito*100,'r.-')
         hold off
-        legend('orig','gluc','mito')
-        title(sprintf('Norm dg/dt: %f',normdtg))
         drawnow
     end
 end
-
 end
 

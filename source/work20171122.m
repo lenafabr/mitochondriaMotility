@@ -31,7 +31,10 @@ plot(log10(Plist),log10(Plist*500/70*25),'k--')
 hold off
 colormap jet
 
-
+% plot using our estimates of kg and P
+hold all
+plot(log10(0.05),log10(1.05),'k.','MarkerSize',20)
+hold off
 %% look at tmito distribution
 plot(xpos,Tmito_all(:,1,66),xpos,1/500*ones(size(xpos)),'--')
 
