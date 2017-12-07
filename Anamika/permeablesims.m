@@ -39,16 +39,26 @@ if (exist('options')==1)
 end
 
 % set up dimensionless parameters
-
+%Nondimensionalize by L, L^2/D and Km
+tscale = (opt.L)^2 / opt.D;
+lscale = opt.L;
+cscale = opt.Km;
 Lh = opt.L/opt.msize;
+Lh = opt.L/lscale;
 velh = 1;
+velh = opt.vel*tscale/lscale;
 kwh = opt.kw/opt.vel*opt.msize;
+kwh = opt.kw*tscale;
 ksh = opt.ks/opt.vel*opt.Km*opt.msize;
+ksh = opt.ks*cscale*tscale; %verify
 Dh = opt.D/opt.msize/opt.vel;
+Dh = opt.D*tscale/lscale^2;
 kgh = opt.kg*opt.msize/opt.vel;
+kgh = opt.kg*tscale;
 c0h = opt.c0/opt.Km;
+c0h = opt.c0/cscale;
 Ph = opt.P * opt.msize / opt.vel;
-
+Ph = opt.P * tscale;
 % spatial resolution
 dx = Lh/(opt.gpts - 1);
 
