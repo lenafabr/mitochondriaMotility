@@ -1,0 +1,164 @@
+\documentclass[12pt,letterpaper]{article}
+\usepackage{booktabs,graphicx,overcite,amsmath,amssymb,longtable}
+
+\usepackage[scanall]{psfrag}
+\usepackage[small,sc]{caption}
+\usepackage[protrusion=true,expansion=true]{microtype}
+%\usepackage[activate={true,nocompatibility},final,tracking=true,kerning=true,spacing=true,factor=1100,stretch=10,shrink=10]{microtype}
+%\usepackage[letterspace=-100]{microtype}
+\usepackage{color,wrapfig}
+\usepackage{setspace,sidecap}
+\usepackage{overcite}
+\graphicspath{figures/}
+\usepackage[letterpaper, left=1in, right=1in, top=0.9in, bottom=1in, nofoot,nohead,footnotesep=0pt, headsep=0in, footskip=0pt]{geometry}
+\usepackage{fancyhdr,multicol}
+%\pagestyle{fancy}
+\pagestyle{plain}
+\graphicspath{{figures/}}
+
+%\usepackage{times}
+\usepackage{newtxtext,newtxmath}
+%\usepackage{mathptmx}
+%\usepackage[scaled=.90]{helvet}
+%\usepackage{courier}
+
+% display page margins
+%\usepackage{showframe}
+
+% squeeze spacing around section titles
+\usepackage[compact]{titlesec}
+%\titlespacing{\section}{0pt}{*0}{*0}
+\titlespacing{\subsection}{0pt}{0.5\baselineskip}{0.2\baselineskip}
+\titleformat*{\subsection}{\bfseries}
+
+%\setlength{\oddsidemargin}{0pt}
+%\setlength{\topmargin}{0pt}
+%\setlength{\textwidth}{6.5in}
+%\setlength{\headsep}{15pt}
+%\setlength{\footheight}{0pt}
+%\addtolength{\textheight}{1 in}
+
+%\renewcommand{\topfraction}{1.0}
+%\renewcommand{\bottomfraction}{1.0}
+%\renewcommand{\textfraction}{0.0}
+
+% subsection numbering
+\renewcommand\thesubsection{\arabic{subsection}}
+
+% squeeze the bibliography by removing separation between items
+\let\oldbibliography\thebibliography
+\renewcommand{\thebibliography}[1]{%
+  \oldbibliography{#1}%
+  \setlength{\itemsep}{0pt}%
+}
+
+\singlespacing
+%\raggedbottom
+%\widowpenalty=0
+%\clubpenalty=0
+%\setstretch{0.99}
+\newcommand{\needcite}{{\bf[CITE]}}
+\normalsize
+
+\setlength{\textfloatsep}{10pt}
+
+% set the header/footer
+%\fancyhead{}
+\fancyfoot{}
+%\fancyhead[L]{\em Elena F. Koslover}
+%\fancyhead[R]{\thepage}
+%\fancyhead[C]{Proposal}
+
+\begin{document}
+
+%Elena F. Koslover
+%\end{center}
+%\vspace{-3\baselineskip}
+%\setlength{\headsep}{0.2in}
+
+%\begin{center}
+%{\large  \bf Intracellular Transport: Motion Through Active Matter}
+%%Elena F. Koslover
+%\end{center}
+
+\section{Mitochondria distribution with localized glucose sources}
+
+\subsection{Summary of model}
+\begin{itemize}
+	\item One-dimensional domain, length $L$
+	\item Glucose behavior:
+	\begin{itemize}
+		\item Concentration is fixed to $c_0$ at the boundaries
+		\item Spreads diffusively with diffusivity $D$
+		\item Consumed by mitochondria with Michaelis-Menten kinetics ($K_M$, $k_g$). Consumption rate (concentration change per unit time) is given by:
+		\begin{equation*}
+		\begin{split}
+		\frac{k_g K_M G(x) H(x) }{G(x)+K_M}
+		\end{split}
+		\end{equation*}
+		where $H(x)$ is mitochondrial density (unitless, integrates to total length of mitochondria in cell), $G(x)$ is glucose concentration.
+	\end{itemize}
+	\item Mitochondria behavior:
+	\begin{itemize}
+		\item Initiate processive walks with rate $k_w$. Assumed to move in random direction for each processive walk.
+		\item Stop processive walks with rate
+		\begin{equation*}
+		\begin{split}
+		r_s(x) = \frac{k_s K_M G(x) }{G(x)+K_M}
+		\end{split}
+		\end{equation*}
+		where $k_s$ is a rate constant (units of per concentration per time). Note that this assumes the $K_M$ is the same for mitochondria stopping and glucose consumption (ie: assuming that glucose hexokinase is the limiting step for both processes)		
+	\end{itemize}
+	\item Equations at steady state:
+	\begin{equation*}
+	\begin{split}
+	D\frac{\partial^2 G}{\partial x^2} - \frac{k_g K_M G}{G+K_M} H(x) = 0 \\
+	H(x) = \frac{f\left[k_w + r_s(x)\right]}{k_w + \frac{1}{L}\int_0^L r_s(x) dx } 
+	\end{split}
+	\end{equation*}		
+	where $f$ is fraction of domain length occupied by mitochondria.
+	\item Dimensionless parameters defining model behavior
+	\begin{equation*}
+	\begin{split}
+	\hat{\lambda} & = \sqrt{\frac{D}{k_g f L^2}}, \quad \text{length-scale of glucose decay, relative to L} \\
+	\hat{c}_0 & = \frac{c_0}{K_M}, \quad \text{boundary concentration, relative to $K_M$} \\
+	\hat{k}_s & = \frac{k_s K_M}{k_w}, \quad \text{equilibrium stopping constant at high glucose}
+	\end{split}
+	\end{equation*}
+	\item Approximate parameter estimates:
+	\begin{itemize}
+		\item Assume sugar consumption by 1 mitochondrion is $2.5\times 10^5\text{ s}^{-1}$ (from yeast)
+		\item Assume mitochondrion length $1\mu$m, axon diameter $2\mu$m, axon length $500\mu\text{m}$.
+		\item Assume $75$ mitochondria in the axon
+		\item Assum $K_M = 0.1$mM
+		\item Assume glucose diffusivity $140\mu\text{m}^2/\text{s}$ (from ATP diffusivity)
+		\item Dimensionless length scale of glucose decay: $\hat{\lambda} \approx 0.06$	
+	\end{itemize}
+	\item Variation metric used to quantify how localized the mitochondria are:
+	\begin{equation*}
+	\begin{split}
+	V = 6 \sigma^2/L^2 - 0.5
+	\end{split}
+	\end{equation*}
+	where $\sigma^2$ is the variance in the mitochondrial distribution. This gives $V=0$ for uniform distribution and $V=1$ for two peaks at the domain edges.
+\end{itemize}
+
+\subsection{Results}
+
+
+
+\renewcommand\refname{\vspace{-\baselineskip}}
+%\nocite{figrefs}
+
+%\newpage
+\begin{multicols}{2}
+	
+\footnotesize
+\setstretch{0.9}
+\bibliographystyle{aip-mod}
+%\bibliography{packard}
+
+\end{multicols}
+%}
+%\end{minipage}
+\end{document}
