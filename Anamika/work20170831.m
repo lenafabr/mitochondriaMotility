@@ -78,7 +78,9 @@ for j = 1:1:nitr
     mitopos_dis(j,:) = mitopos;
     
     [j varmito(j)]
-end%This code is the same as work20170829.m except the starting distribution
+end
+
+%% This code is the same as work20170829.m except the starting distribution
 %is uniform
 % run iterative sim (check glucose profile and mitochondria distrib)
 

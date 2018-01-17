@@ -49,6 +49,7 @@ options.nstep = 2e5;
 options.kw = 1;
 options.showmito = 1;
 options.showevery = 500;
+options.msize = 1;
 
 % TRY STARTING UNIFORM
 options.startpos = -1;
@@ -70,5 +71,5 @@ for j = 1:1:nitr
     
     [j varmito(j)]
     
-    save('/home/ekoslover/proj/mitochondriaMotility/results/discretesims_500mito_unif_cpt1_20170928.mat')
+    %save('/home/ekoslover/proj/mitochondriaMotility/results/discretesims_500mito_unif_cpt1_20170928.mat')
 end
