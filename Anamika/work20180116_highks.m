@@ -49,7 +49,9 @@ for i = 1:1:nl
         Tmito_all(:,i,j) = Tmito;
         var_mito(i,j) = var(xpos,Tmito) ; %variance in mitochondria position distribution;
         varmetric(i,j) = 6*var_mito(i,j)/options.L^2 - 0.5;
+        
     end
+    percent_completed_highks = (i/nl) * 100
 end
 %save the workspace
 formatOut = 'yyyymmdd';

@@ -1,23 +1,8 @@
-%Generating ks vs c0 surface plot
-%% ks and c0 - from old data
-load ('workspace_20171006ksc0.mat')
-colormap jet;
-pcolor(log10(c0list),log10(kslist),varmetric); shading flat
-xlabel('log10(c0)')
-ylabel('log10(k_s)')
-title(sprintf('Variance Metric for varying k_s and c0,\lambda = %',lambda_hat));
-figure
-colormap jet;
-pcolor(log10(c0list),log10(kslist),Smito_int_plot); shading flat
-xlabel('log10(c0)')
-ylabel('log10(k_s)')
-title(sprintf('Fraction of mitochondria stopped for varying k_s and c0, \lambda = %',lambda_hat));
-%% ks and c0 - from new data, different dimensionless units follows
-%% Run wrapper for changing ks and c0
-%lambda_hat fixed at 0.14
+%% Run wrapper for changing c0 and lambda_hat
+%ks fixed at 1e4
 %changing c0_hat = c0/Km
-%changing ks
-%nmito = 100
+%changing lambda_hat
+%nmito = 75
 
 % set up parameter values different from default
 lambda_hat = 0.06;
@@ -25,15 +10,15 @@ options.D = 140;
 c0_llim = -2;
 c0_ulim = 2;
 nc0 = 102;
-ks_llim = -2;
-ks_ulim = 3;
-nks = 101;
+lh_llim = -2;
+lh_ulim = 2;
+nlh = 101;
 options.D = 140;
 options.msize = 1;
 options.nmito = 75;
 options.gpts = 100;
 options.L = 500;
-options.kg = options.D ./ (options.nmito * options.msize * options.L * (lambda_hat^2));
+
 options.dodisplay = 0;
 options.dttol = 1e-3;
 options.delt = 1e-5;
@@ -44,14 +29,15 @@ options.nstep = 1e6;
 %change c0 at each iteration, thereby changing A
 
 c0list = logspace(c0_llim,c0_ulim,nc0);
-kslist = logspace(ks_llim,ks_ulim,nks);
+lhlist = logspace(lh_llim,lh_ulim,nlh);
 
-Gstat_all = zeros(options.gpts,nc0,nks);
-Tmito_all = zeros(options.gpts,nc0,nks);
+Gstat_all = zeros(options.gpts,nc0,nlh);
+Tmito_all = zeros(options.gpts,nc0,nlh);
 
 
-for i = 1:1:nks
-    options.ks = kslist(i);
+for i = 1:1:nlh
+    lambda_hat = lhlist(i);
+    options.kg = options.D ./ (options.nmito * options.msize * options.L * (lambda_hat^2));
     for j = 1:1:nc0
         options.c0 = c0list(j);
         options.cend = options.c0;
@@ -67,33 +53,25 @@ for i = 1:1:nks
         var_mito(i,j) = var(xpos,Tmito) ; %variance in mitochondria position distribution;
         varmetric(i,j) = 6*var_mito(i,j)/options.L^2 - 0.5; 
     end
-    percent_completed = (i/nks * 100)
+    percent_completed = (i/nlh * 100)
 end
 
 %save the workspace
 formatOut = 'yyyymmdd';
 date = datestr(datetime('today'),formatOut);
 %save workspace with today's date'
-filename = strcat('workspace_',date,'ksc0_newdim');
+filename = strcat('workspace_',date,'lhc0_newdim');
 save (filename);
-%% get surface plot of varmetric vs c0 and ks
+%% get surface plot of varmetric vs c0 and lh
 figure;
 varmetric = 6*var_mito/options.L^2 - 0.5;
 colormap jet;
-pcolor(log10(c0list),log10(kslist),varmetric); shading flat
+pcolor(log10(c0list),log10(lhlist),varmetric); shading flat
 xlabel('log10(c0)')
-ylabel('log10(ks)')
-title(sprintf('varmetric plot for lmdh = 0.06'));
+ylabel('log10(\lambda)')
+title(sprintf('Variance Metric Plot for k_s = 10000'));
 
 
-%% get surface plot of Smito_int vs c0 and ks
-figure;
-colormap jet;
-Smito_int_plot = squeeze(Smito_int_all);
-pcolor(log10(c0list),log10(kslist),Smito_int_plot); shading flat
-xlabel('log10(c0)')
-ylabel('log10(ks)')
-title(sprintf('fraction of mitochondria stopped for lmdh = 0.06'));
 
 
 %% look at conc necessary to achieve variance cutoff 
@@ -131,5 +109,3 @@ xlim([1e-2,1])
 %loglog(lambda_hat,c0cutoff(:,A2_ind),lambda_hat,0.07./lambda_hat.^2)
 xlabel('lambda hat')
 ylabel(sprintf('conc to get %f cutoff',cutoff))
-
-

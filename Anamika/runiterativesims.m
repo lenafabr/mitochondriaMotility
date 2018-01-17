@@ -3,7 +3,7 @@ function [gluc,Tmito,Smito,Smito_int,normdtg,gluc_init,opt,xpos,lmdh,ftc] = runi
 opt = struct();
 
 opt.kg = 1; % rate of glucose consumption
-opt.c0 = 1; % fixed glucose concentration
+opt.c0 = 0.01; % fixed glucose concentration
 opt.msize = 1; % mitochondria size
 
 opt.L = 500; % domain size
@@ -18,8 +18,8 @@ opt.startgluc = [];
 
 opt.nmito = 1; % number of mitochondria
 opt.gpts = 100; % number of discrete spatial points for evaluating gluc concentration
-opt.delt = 1e-7; % time-step
-opt.nstep = 1e5; % number of steps to run
+opt.delt = 1e-5; % time-step
+opt.nstep = 1e6; % number of steps to run
 
 % boundary conditions on the far size
 % positive = fixed concentration at the boundary
