@@ -9,11 +9,11 @@ opt.c0 = 1; % fixed glucose concentration
 opt.msize = 1; % mitochondria size
 
 opt.L = 500; % domain size
-opt.vel = 0.05; % mitochondria velocity
+opt.vel = 1; % mitochondria velocity
 opt.D = 140;% glucose diffusion coefficient
 opt.kw = 1; % rate of starting a walk
 %opt.ks = 1e4; % rate of stopping is ks*[gluc] %consider high ks limit
-opt.ks = 10; %somewhat low ks
+opt.ks = 100; %somewhat low ks
 opt.Km = 0.1; 
 
 
@@ -26,9 +26,9 @@ opt.startgluc = [];
 opt.fixgluc = [];
 
 opt.nmito = 75; % number of mitochondria, updated from Gulcin's paper
-opt.gpts = 100; % number of discrete spatial points for evaluating gluc concentration
+opt.gpts = 500; % number of discrete spatial points for evaluating gluc concentration
 opt.delt = 1e-6; % time-step
-opt.nstep = 1e5; % number of steps to run
+opt.nstep = 1e7; % number of steps to run
 
 % boundary conditions on the far size
 % positive = fixed concentration at the boundary
@@ -45,7 +45,7 @@ opt.pstartwalk = opt.kw/(opt.kw + opt.ks*opt.c0);
 
 % displaying plots
 opt.dodisplay = 1;
-opt.showevery = 100;
+opt.showevery = 1e4;
 opt.showmito = 1;
 
 opt.restart = 1; % flag to enable continuing previous sims
@@ -191,12 +191,12 @@ for step = 1:opt.nstep
     
     %% reflect mitochondria back if hitting the boundary
     for mc = walkind'
-        if (mitopos(mc)<0.5)
+        if (mitopos(mc)<0.5*msizeh)
             mitostate(mc)=1;
-            mitopos(mc) = 0.5+(0.5-mitopos(mc));
-        elseif mitopos(mc)>Lh-0.5
+            mitopos(mc) = msizeh*(0.5+(0.5-mitopos(mc)));
+        elseif mitopos(mc)>Lh-0.5*msizeh
             mitostate(mc) = -1;
-            mitopos(mc) = Lh-0.5 - (mitopos(mc)-Lh+0.5);
+            mitopos(mc) = Lh-0.5*msizeh - (mitopos(mc)*msizeh-Lh+0.5*msizeh);
         end
     end
   
