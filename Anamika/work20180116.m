@@ -31,7 +31,7 @@ options.nstep = 1e6;
 c0list = logspace(c0_llim,c0_ulim,nc0);
 lhlist = logspace(lh_llim,lh_ulim,nlh);
 
-Gstat_all = zeros(options.gpts,nc0,nlh);
+gluc_all = zeros(options.gpts,nc0,nlh);
 Tmito_all = zeros(options.gpts,nc0,nlh);
 
 
@@ -51,7 +51,7 @@ for i = 1:1:nlh
         Smito_int_all(:,i,j) = Smito_int;
         Smito_all(:,i,j) = Smito;
         var_mito(i,j) = var(xpos,Tmito) ; %variance in mitochondria position distribution;
-        varmetric(i,j) = 6*var_mito(i,j)/options.L^2 - 0.5; 
+        varmetric(i,j) = 6*var_mito(i,j) - 0.5; %Lh = 1
     end
     percent_completed = (i/nlh * 100)
 end
@@ -64,7 +64,7 @@ filename = strcat('workspace_',date,'lhc0_newdim');
 save (filename);
 %% get surface plot of varmetric vs c0 and lh
 figure;
-varmetric = 6*var_mito/options.L^2 - 0.5;
+varmetric = 6*var_mito - 0.5; %Lh = 1;
 colormap jet;
 pcolor(log10(c0list),log10(lhlist),varmetric); shading flat
 xlabel('log10(c0)')

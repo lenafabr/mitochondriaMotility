@@ -10,7 +10,7 @@ opt.L = 500; % domain size
 opt.D = 140;% glucose diffusion coefficient
 opt.kw = 1; % rate of starting a walk
 opt.ks = 1; % rate of stopping is ks*[gluc]
-opt.Km = 1;
+opt.Km = 0.1;
 
 % starting glucose distribution
 % default is to start linear
@@ -87,7 +87,7 @@ ftc = 0; %flag for failing to converge. Is 1 when fails to converge.
 normdtg = inf;
 
 dtcutoff = opt.dttol;
-spacing = Lh/opt.gpts; %integration spacing
+spacing = Lh/(opt.gpts-1); %integration spacing
 
 initglucint = spacing * trapz(gluc_init);
 

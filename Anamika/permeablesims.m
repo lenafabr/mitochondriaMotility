@@ -11,13 +11,13 @@ opt.vel = 1; % mitochondria velocity
 opt.D = 140;% glucose diffusion coefficient
 opt.kw = 1; % rate of starting a walk
 opt.ks = 1; % rate of stopping is ks*[gluc]
-opt.Km = 1;
+opt.Km = 0.1;
 
 % starting glucose distribution
 % default is to start linear
 opt.startgluc = [];
 
-opt.nmito = 1; % number of mitochondria
+opt.nmito = 75; % number of mitochondria
 opt.gpts = 100; % number of discrete spatial points for evaluating gluc concentration
 opt.delt = 1e-3; % time-step
 opt.nstep = 1e5; % number of steps to run

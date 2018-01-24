@@ -11,23 +11,23 @@ options.showevery=1000;
 options.gpts = 100;
 [gluc, mitopos, mitostate, opt] = rundiscretesims(options)
 
-%% attempt to reproduce old results using old parameters
+%% attempt to reproduce old results using new (paper) parameters
 
-options.nstep = 1e5;
+options.nstep = 1e6;
 options.Km = 0.1;
 options.c0 = 0.1;
 options.kw = 1;
 options.L = 500;
 options.ks=100;
 options.kg=1;
-options.dodisplay=1;
+options.dodisplay=0;
 options.showevery=100;
 options.nmito=75;
 
 options.delt = 0.05;
 options.gpts = 100;
 nitr = 100;
-%
+%nitr = 1;
 clear varmito gluc_dis mitopos_dis
 for j = 1:1:nitr
     [gluc, mitopos, mitostate, opt] = rundiscretesims(options);
@@ -37,7 +37,12 @@ for j = 1:1:nitr
     
     [j varmito(j)]
 end
-
+%save the workspace
+formatOut = 'yyyymmdd';
+date = datestr(datetime('today'),formatOut);
+%save workspace with today's date'
+filename = strcat('workspace_',date,'discretesims_100itr');
+save (filename);
 
 %% attempt to reproduce old results using old parameters
 

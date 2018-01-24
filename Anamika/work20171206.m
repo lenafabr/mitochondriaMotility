@@ -78,7 +78,7 @@ filename = strcat('workspace_',date,'ksc0_newdim');
 save (filename);
 %% get surface plot of varmetric vs c0 and ks
 figure;
-varmetric = 6*var_mito/options.L^2 - 0.5;
+varmetric = 6*var_mito- 0.5; %Lh = 1
 colormap jet;
 pcolor(log10(c0list),log10(kslist),varmetric); shading flat
 xlabel('log10(c0)')

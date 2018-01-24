@@ -1,6 +1,6 @@
 %work20180110
 %code to produce discrete simulation plots for paper
-function  [gluc, mitopos, mitostate, opt] = runmitosim(options)
+function  [gluc, mitopos, mitostate, opt] = rundiscretesims(options)
 
 %% set up default simulation parameters
 opt = struct();
@@ -15,7 +15,7 @@ opt.D = 140;% glucose diffusion coefficient
 opt.kw = 1; % rate of starting a walk
 %opt.ks = 1e4; % rate of stopping is ks*[gluc] %consider high ks limit
 opt.ks = 200; %somewhat low ks
-opt.Km = 0.1; 
+opt.Km = 0.1;
 
 % starting glucose distribution
 % default is to start linear
@@ -53,7 +53,7 @@ end
 % positive = fixed concentration at the boundary
 % negative = reflecting boundary
 if(~isfield(opt,'cend'))
-    opt.cend = opt.c0; 
+    opt.cend = opt.c0;
 end
 
 % set up dimensionless parameters
@@ -153,39 +153,39 @@ for step = 1:opt.nstep
     end
     
     if (isempty(opt.fixgluc))
-    % ---------
-    % evolve forward the glucose concentration by 1 time step
-    % ----------
-    % second derivative of gluc
-    d2g(2:end-1) = (gluc(3:end)+gluc(1:end-2) - 2*gluc(2:end-1))/dx^2;
-    % time derivative due to diffusion
-    dtg = Dh*d2g;
-    % time derivative due to glucose consumption
-    for mc = 1:opt.nmito
-        % get indices of spatial points within this mitochondria
-        ind1 = floor((mitopos(mc)-1/2*msizeh)/dx)+1;
-        ind2 = floor((mitopos(mc)+1/2*msizeh)/dx);        
-        % dimensionless consumption rate of 1
-        % note: overlapping mitochondria will consume twice as fast
-        dtg(ind1:ind2) = dtg(ind1:ind2)-kgh*Kmh*gluc(ind1:ind2)./(Kmh+gluc(ind1:ind2));
-    end
-    
-    % fix boundary conditions
-    dtg(1) = 0; 
-    if (opt.cend>0)
-        % fixed conc at far end
-        dtg(end) = 0;
-    else
-        % reflecting boundary at far end
-        error('reflecting boundary not yet implemented')
-    end
-    
-    % evolve forward
-    gluc = gluc+dtg*delth;    
-    
-    if (any(gluc<-1e-3))
-        error('negative concentrations!')
-    end    
+        % ---------
+        % evolve forward the glucose concentration by 1 time step
+        % ----------
+        % second derivative of gluc
+        d2g(2:end-1) = (gluc(3:end)+gluc(1:end-2) - 2*gluc(2:end-1))/dx^2;
+        % time derivative due to diffusion
+        dtg = Dh*d2g;
+        % time derivative due to glucose consumption
+        for mc = 1:opt.nmito
+            % get indices of spatial points within this mitochondria
+            ind1 = floor((mitopos(mc)-1/2*msizeh)/dx)+1;
+            ind2 = floor((mitopos(mc)+1/2*msizeh)/dx);
+            % dimensionless consumption rate of 1
+            % note: overlapping mitochondria will consume twice as fast
+            dtg(ind1:ind2) = dtg(ind1:ind2)-kgh*Kmh*gluc(ind1:ind2)./(Kmh+gluc(ind1:ind2));
+        end
+        
+        % fix boundary conditions
+        dtg(1) = 0;
+        if (opt.cend>0)
+            % fixed conc at far end
+            dtg(end) = 0;
+        else
+            % reflecting boundary at far end
+            error('reflecting boundary not yet implemented')
+        end
+        
+        % evolve forward
+        gluc = gluc+dtg*delth;
+        
+        if (any(gluc<-1e-3))
+            error('negative concentrations!')
+        end
     end
     
     % move the walking mitochondria
@@ -203,7 +203,7 @@ for step = 1:opt.nstep
             mitopos(mc) = Lh-0.5*msizeh - (mitopos(mc)-Lh+0.5*msizeh);
         end
     end
-  
+    
     %%
     % decide which mitochondria stop
     % glucose concentrations at mitochondria positions
@@ -212,8 +212,8 @@ for step = 1:opt.nstep
     pstop = 1-exp(-stoprate*delth);
     u = rand(length(walkind),1);
     mitostate(walkind) = mitostate(walkind).*(1 - (u<=pstop));
-       
-    % decide which mitochondria start after this step   
+    
+    % decide which mitochondria start after this step
     u = rand(length(stopind),1);
     restartind = find(u<=pstart);
     mitostate(stopind(restartind)) = (rand(length(restartind),1)<=0.5)*2 - 1; % start in random direction
@@ -249,4 +249,5 @@ for step = 1:opt.nstep
     end
     
     curtime = curtime +delth;
+end
 end
