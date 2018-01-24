@@ -4,31 +4,47 @@
 
 %first generate discrete histogram
 load('workspace_20180119discretesims_100itr');
-%concatenate mitopos_dis to one long array
+%% concatenate mitopos_dis to one long array
 mitodis = reshape(mitopos_dis,[1,size(mitopos_dis,1)*size(mitopos_dis,2)]);
-hist_mito = histogram(mitodis,20,'Normalization','probability');
-histogram(mitodis,100,'Normalization','probability');
-hold on;
+hist_mito = histogram(mitodis,20,'Normalization','pdf');
+%hold on
+%histogram(mitodis,100,'Normalization','pdf');
+%hold off;
 
-%then generate plot from iterative sims
+
+
+
+%% then generate plot from iterative sims
 options.nstep = 1e6;
 options.Km = 0.1;
 options.c0 = 0.1;
 options.kw = 1;
 options.L = 500;
 options.ks=100;
-options.kg=1;
+options.kg=1/10;
 options.dodisplay=0;
 options.showevery=100;
-options.nmito=75;
+options.nmito=750;
 
 options.delt = 1e-5;
 options.nstep = 1e7;
 options.gpts = 100;
 [gluc_itr,Tmito_itr,Smito_itr,Smito_int_itr,normdtg,gluc_init,opt,xpos,lmdh,ftc] = runiterativesims(options);
 
-plot(xpos,Tmito_itr/100)
+dx = xpos(2)-xpos(1);
+Nfact = trapz(Tmito_itr)*dx;
+hold all
+plot(xpos,Tmito_itr/Nfact)
+hold off
 
+%% plot glucose comparing iterative and discrete sims
+
+gluc_overall = mean(gluc_dis,1);
+xpos = linspace(0,1,100);
+plot(xpos,gluc_overall)
+hold all
+plot(xpos,gluc_itr)
+hold off
 %% to plot figure 2 (Tmito for various c0) and the analytical soln
 clear
 % First plot Tmito from simulations

@@ -21,12 +21,6 @@ opt.gpts = 100; % number of discrete spatial points for evaluating gluc concentr
 opt.delt = 1e-5; % time-step
 opt.nstep = 1e6; % number of steps to run
 
-% boundary conditions on the far size
-% positive = fixed concentration at the boundary
-% negative = reflecting boundary
-opt.cend = 1;
-cendh = opt.cend/opt.Km;
-
 % starting position of mitochondria
 % default (<0) means start uniformly
 opt.startpos = -1;
