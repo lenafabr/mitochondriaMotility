@@ -6,7 +6,7 @@
 load('workspace_20180119discretesims_100itr');
 %% concatenate mitopos_dis to one long array
 mitodis = reshape(mitopos_dis,[1,size(mitopos_dis,1)*size(mitopos_dis,2)]);
-hist_mito = histogram(mitodis,20,'Normalization','pdf');
+hist_mito = histogram(mitodis,30,'Normalization','pdf');
 %hold on
 %histogram(mitodis,100,'Normalization','pdf');
 %hold off;
@@ -15,7 +15,6 @@ hist_mito = histogram(mitodis,20,'Normalization','pdf');
 
 
 %% then generate plot from iterative sims
-options.nstep = 1e6;
 options.Km = 0.1;
 options.c0 = 0.1;
 options.kw = 1;

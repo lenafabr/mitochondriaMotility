@@ -1,4 +1,4 @@
-function [gluc,Tmito,Smito,Smito_int,normdtg,gluc_init,opt,xpos,lmdh,ftc] = runiterativesims(options)
+function [gluc,Tmito,Smito,Smito_int,normdtg,dtcutoff,gluc_init,opt,xpos,lmdh,ftc] = runiterativesims(options)
 %% set up default simulation parameters
 opt = struct();
 
@@ -80,7 +80,7 @@ ftc = 0; %flag for failing to converge. Is 1 when fails to converge.
 
 normdtg = inf;
 
-dtcutoff = opt.dttol/tscale;
+dtcutoff = opt.dttol;
 spacing = dx;
 initglucint = dx * trapz(gluc_init);
 

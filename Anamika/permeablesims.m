@@ -80,7 +80,7 @@ ksx = zeros(opt.gpts+2,1);
 
 ftc = 0; %flag for failing to converge. Is 1 when fails to converge. 
 normdtg = inf;
-dtcutoff = opt.dttol/tscale;
+dtcutoff = opt.dttol;
 spacing = dx; %integration spacing
 
 %% Iterative process
