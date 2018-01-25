@@ -19,8 +19,8 @@ opt.startgluc = [];
 
 opt.nmito = 75; % number of mitochondria
 opt.gpts = 100; % number of discrete spatial points for evaluating gluc concentration
-opt.delt = 1e-3; % time-step
-opt.nstep = 1e5; % number of steps to run
+opt.delt = 1e-5; % time-step
+opt.nstep = 1e7; % number of steps to run
 
 opt.P = 0.1; %permeability
 opt.f = opt.nmito * opt.msize / opt.L;
@@ -43,22 +43,15 @@ end
 tscale = (opt.L)^2 / opt.D;
 lscale = opt.L;
 cscale = opt.Km;
-Lh = opt.L/opt.msize;
 Lh = opt.L/lscale;
-velh = 1;
-velh = opt.vel*tscale/lscale;
-kwh = opt.kw/opt.vel*opt.msize;
 kwh = opt.kw*tscale;
-ksh = opt.ks/opt.vel*opt.Km*opt.msize;
-ksh = opt.ks*cscale*tscale; %verify
-Dh = opt.D/opt.msize/opt.vel;
+ksh = opt.ks*cscale*tscale; 
 Dh = opt.D*tscale/lscale^2;
-kgh = opt.kg*opt.msize/opt.vel;
 kgh = opt.kg*tscale;
-c0h = opt.c0/opt.Km;
 c0h = opt.c0/cscale;
-Ph = opt.P * opt.msize / opt.vel;
+msizeh = opt.msize/lscale;
 Ph = opt.P * tscale;
+delth = opt.delt/tscale;
 % spatial resolution
 dx = Lh/(opt.gpts - 1);
 
@@ -74,7 +67,7 @@ if (~isempty(opt.startgluc))
     if (length(opt.startgluc) ~= opt.gpts); error('starting distrib has wrong size'); end
     gluc_init = opt.startgluc;
 else
-    lmdh = sqrt(Dh./(kgh*opt.nmito*Lh)); %lambda-hat
+    lmdh = sqrt(Dh./(kgh*opt.nmito*msizeh*Lh)); %lambda-hat
     gluc_init =  c0h * cosh((xpos-Lh/2)./(Lh * lmdh)) ./ cosh(0.5/lmdh);
 end
 gluc = gluc_init;
@@ -87,7 +80,7 @@ ksx = zeros(opt.gpts+2,1);
 
 ftc = 0; %flag for failing to converge. Is 1 when fails to converge. 
 normdtg = inf;
-dtcutoff = opt.dttol;%*(kgh*opt.Km/(opt.Km+1));
+dtcutoff = opt.dttol/tscale;
 spacing = dx; %integration spacing
 
 %% Iterative process
@@ -115,7 +108,7 @@ while (normdtg > dtcutoff)
     % time derivative of glucose
     dtg(2:end-1) = Dh*d2g(2:end-1) - (kgh * opt.Km * opt.nmito) * (gluc_new(2:end-1) .* Tmito(2:end-1)) ./ (opt.Km + gluc_new(2:end-1));
     normdtg = norm(dtg);
-    gluc_new = gluc_new+dtg*opt.delt;
+    gluc_new = gluc_new+dtg*delth;
        
     if (any(gluc_new < -1e-3))
          disp('Concentration went negative. Try smaller timestep.')

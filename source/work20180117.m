@@ -13,7 +13,8 @@ options.gpts = 100;
 
 %% attempt to reproduce old results using new (paper) parameters
 
-options.nstep = 1e6;
+%options.nstep = 1e6; %desired
+options.nstep = 2e5; %might work
 options.Km = 0.1;
 options.c0 = 0.1;
 options.kw = 1;
@@ -41,7 +42,7 @@ end
 formatOut = 'yyyymmdd';
 date = datestr(datetime('today'),formatOut);
 %save workspace with today's date'
-filename = strcat('workspace_',date,'discretesims_100itr');
+filename = strcat('workspace_',date,'discretesims_100itr_nstep2e5');
 save (filename);
 
 %% attempt to reproduce old results using old parameters
