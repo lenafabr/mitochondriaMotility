@@ -1,4 +1,4 @@
-%% Run wrapper for changing c0 and lambda_hat and P
+%% Ends permeable, run wrapper for changing c0 and lambda_hat and P
 %ks fixed at 1e4
 %changing c0_hat = c0/Km
 %changing lambda_hat

@@ -1,14 +1,14 @@
 %% Run wrapper for changing c0 and lambda_hat
-%ks fixed at 1, 10, 100
-%get 1e4 data from workspace_lhc0newdim
+%ks fixed at 1, 10, 100, 1e4
+%Km = 0.1
 %changing c0_hat = c0/Km
 %changing lambda_hat
 %nmito = 75
 
 % set up parameter values different from default
-lambda_hat = 0.06;
 options.D = 140;
-c0_llim = -2;
+options.Km = 0.1;
+c0_llim = -3;
 c0_ulim = 2;
 nc0 = 102;
 lh_llim = -2;
@@ -31,12 +31,13 @@ options.nstep = 1e6;
 
 c0list = logspace(c0_llim,c0_ulim,nc0);
 lhlist = logspace(lh_llim,lh_ulim,nlh);
-kslist = {1,10,100};
+kslist = {1,10,100,1e4};
+nks = 4;
 
 Gstat_all = zeros(options.gpts,nc0,nlh,3);
 Tmito_all = zeros(options.gpts,nc0,nlh,3);
 
-for k = 1:1:3
+for k = 1:1:nks
     options.ks = kslist{k};
     for i = 1:1:nlh
         lambda_hat = lhlist(i);
@@ -56,12 +57,12 @@ for k = 1:1:3
             var_mito(i,j) = var(xpos,Tmito) ; %variance in mitochondria position distribution;
             varmetric(i,j) = 6*var_mito(i,j)/options.L^2 - 0.5;
         end
-        percent_completed = (i/nlh * 100)
+        percent_completed = (i/nlh * 100) * (k/nks);
     end
 end
 %save the workspace
 formatOut = 'yyyymmdd';
 date = datestr(datetime('today'),formatOut);
 %save workspace with today's date'
-filename = strcat('workspace_',date,'lhc0_newdim_ks_1_10_100');
+filename = strcat('workspace_',date,'lhc0_ks_1_10_100_1e4_Km0_1');
 save (filename);
