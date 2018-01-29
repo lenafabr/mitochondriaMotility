@@ -37,6 +37,9 @@ opt.startpos = -1;
 opt.pstartwalk = opt.kw/(opt.kw + opt.ks*opt.c0);
 %opt.pstartwalk = kwh/(kwh + ksh*c0h);
 
+% fix glucose concentrations
+opt.glucfix = 0;
+
 % displaying plots
 opt.dodisplay = 1;
 opt.showevery = 5e3;
@@ -156,10 +159,12 @@ for step = 1:opt.nstep
         % ---------
         % evolve forward the glucose concentration by 1 time step
         % ----------
-        % second derivative of gluc
-        d2g(2:end-1) = (gluc(3:end)+gluc(1:end-2) - 2*gluc(2:end-1))/dx^2;
-        % time derivative due to diffusion
-        dtg = Dh*d2g;
+        if (~opt.glucfix)
+            % second derivative of gluc
+            d2g(2:end-1) = (gluc(3:end)+gluc(1:end-2) - 2*gluc(2:end-1))/dx^2;
+            % time derivative due to diffusion
+            dtg = Dh*d2g;
+        end
         % time derivative due to glucose consumption
         % estimate consumption rate at all the mito positions
         %glucmito = interp1(xpos,gluc,mitopos);
@@ -200,18 +205,20 @@ for step = 1:opt.nstep
 %             %----------
         end
         
-        % fix boundary conditions
-        dtg(1) = 0;
-        if (opt.cend>0)
-            % fixed conc at far end
-            dtg(end) = 0;
-        else
-            % reflecting boundary at far end
-            error('reflecting boundary not yet implemented')
+        if (~opt.glucfix)
+            % fix boundary conditions
+            dtg(1) = 0;
+            if (opt.cend>0)
+                % fixed conc at far end
+                dtg(end) = 0;
+            else
+                % reflecting boundary at far end
+                error('reflecting boundary not yet implemented')
+            end
+            
+            % evolve forward
+            gluc = gluc+dtg*delth;
         end
-        
-        % evolve forward
-        gluc = gluc+dtg*delth;
         
         if (any(gluc<-1e-3))
             error('negative concentrations!')
@@ -237,9 +244,9 @@ for step = 1:opt.nstep
     %%
     % decide which mitochondria stop
     % glucose concentrations at mitochondria positions
-    %glucmito = interp1(xpos,gluc,mitopos(walkind));
-    %stoprate = ksh*Kmh*glucmito./(Kmh+glucmito);
-    stoprate = ksh*Kmh*glucmito(walkind)./(Kmh+glucmito(walkind));
+    glucmito = interp1(xpos,gluc,mitopos(walkind));
+    stoprate = ksh*Kmh*glucmito./(Kmh+glucmito);
+    %stoprate = ksh*Kmh*glucmito(walkind)./(Kmh+glucmito(walkind));
     pstop = 1-exp(-stoprate*delth);
     u = rand(length(walkind),1);
     mitostate(walkind) = mitostate(walkind).*(1 - (u<=pstop));
