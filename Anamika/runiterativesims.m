@@ -51,6 +51,7 @@ Dh = opt.D*tscale/lscale^2;
 kgh = opt.kg*tscale;
 c0h = opt.c0/cscale;
 msizeh = opt.msize/lscale;
+Kmh = opt.Km/cscale;
 
 % spatial resolution
 dx = Lh/(opt.gpts - 1);
@@ -92,7 +93,7 @@ step = 0;
 while (normdtg > dtcutoff)
     
     %Calculate distribution of total number of mitochondria
-    ksx = ksh * opt.Km * gluc ./ (opt.Km + gluc);
+    ksx = ksh * Kmh * gluc ./ (Kmh + gluc);
     ksx_int = spacing * trapz(ksx);
     Tmito = (ksx/kwh + 1) ./ (Lh + (ksx_int/kwh));
     Smito = (ksx/kwh) ./ (Lh + (ksx_int/kwh));

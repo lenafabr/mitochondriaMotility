@@ -196,7 +196,7 @@ for step = 1:opt.nstep
             
             ind1 = ceil((mitopos(mc)-1/2*msizeh)/dx)+1;
             ind2 = floor((mitopos(mc)+1/2*msizeh)/dx)+1;
-            glucmito(mc) = gluc(ind1);
+            glucmito(mc) = (gluc(ind1)+gluc(ind2))/2;
             % dimensionless consumption rate of 1
             % note: overlapping mitochondria will consume twice as fast
             if (ind2>=ind1)
@@ -244,9 +244,12 @@ for step = 1:opt.nstep
     %%
     % decide which mitochondria stop
     % glucose concentrations at mitochondria positions
-    glucmito = interp1(xpos,gluc,mitopos(walkind));
-    stoprate = ksh*Kmh*glucmito./(Kmh+glucmito);
-    %stoprate = ksh*Kmh*glucmito(walkind)./(Kmh+glucmito(walkind));
+    % OLD version: interpolate glucose, more accurate but slower
+    %glucmito = interp1(xpos,gluc,mitopos(walkind));
+    %stoprate = ksh*Kmh*glucmito./(Kmh+glucmito);
+    
+    % NEW version: use glucose at discrete points around mito position
+    stoprate = ksh*Kmh*glucmito(walkind)./(Kmh+glucmito(walkind));
     pstop = 1-exp(-stoprate*delth);
     u = rand(length(walkind),1);
     mitostate(walkind) = mitostate(walkind).*(1 - (u<=pstop));
