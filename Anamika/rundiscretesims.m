@@ -161,13 +161,43 @@ for step = 1:opt.nstep
         % time derivative due to diffusion
         dtg = Dh*d2g;
         % time derivative due to glucose consumption
-        for mc = 1:opt.nmito
-            % get indices of spatial points within this mitochondria
-            ind1 = floor((mitopos(mc)-1/2*msizeh)/dx)+1;
-            ind2 = floor((mitopos(mc)+1/2*msizeh)/dx);
+        % estimate consumption rate at all the mito positions
+        %glucmito = interp1(xpos,gluc,mitopos);
+        %consum = kgh*Kmh*glucmito./(Kmh+glucmito);
+        
+        glucmito = zeros(opt.nmito,1);
+        for mc = 1:opt.nmito            
+            % fractional consumption at index before mitochondrion
+%             ind0 = floor((mitopos(mc)-1/2*msizeh)/dx)+1;
+%             dist0 = mitopos(mc)-1/2*msizeh - xpos(ind0); 
+%             dtg(ind0) = dtg(ind0)-(dx-dist0)/dx*consum(mc);
+%             
+%             % fractional consumption at index after mitochondrion
+%             indf = ceil((mitopos(mc)+1/2*msizeh)/dx)+1;
+%             distf = xpos(indf) - (mitopos(mc)+1/2*msizeh); 
+%             dtg(indf) = dtg(indf) - (dx-distf)/dx*consum(mc);
+%             
+%             % indices within the mitochondrion
+%             ind1 = ceil((mitopos(mc)-1/2*msizeh)/dx)+1;
+%             ind2 = floor((mitopos(mc)+1/2*msizeh)/dx)+1;
+%             if (ind2>=ind1)
+%                 dtg(ind1:ind2) = dtg(ind1:ind2) - consum(mc);
+%             end
+%             %----------
+%             % OLD VERSION
+%             % get indices of spatial points within this mitochondria             
+%            ind1 = floor((mitopos(mc)-1/2*msizeh)/dx)+1;
+%            ind2 = floor((mitopos(mc)+1/2*msizeh)/dx);
+            
+            ind1 = ceil((mitopos(mc)-1/2*msizeh)/dx)+1;
+            ind2 = floor((mitopos(mc)+1/2*msizeh)/dx)+1;
+            glucmito(mc) = gluc(ind1);
             % dimensionless consumption rate of 1
             % note: overlapping mitochondria will consume twice as fast
-            dtg(ind1:ind2) = dtg(ind1:ind2)-kgh*Kmh*gluc(ind1:ind2)./(Kmh+gluc(ind1:ind2));
+            if (ind2>=ind1)
+                dtg(ind1:ind2) = dtg(ind1:ind2)-kgh*Kmh*gluc(ind1:ind2)./(Kmh+gluc(ind1:ind2));
+            end
+%             %----------
         end
         
         % fix boundary conditions
@@ -207,8 +237,9 @@ for step = 1:opt.nstep
     %%
     % decide which mitochondria stop
     % glucose concentrations at mitochondria positions
-    glucmito = interp1(xpos,gluc,mitopos(walkind));
-    stoprate = ksh*Kmh*glucmito./(Kmh+glucmito);
+    %glucmito = interp1(xpos,gluc,mitopos(walkind));
+    %stoprate = ksh*Kmh*glucmito./(Kmh+glucmito);
+    stoprate = ksh*Kmh*glucmito(walkind)./(Kmh+glucmito(walkind));
     pstop = 1-exp(-stoprate*delth);
     u = rand(length(walkind),1);
     mitostate(walkind) = mitostate(walkind).*(1 - (u<=pstop));
