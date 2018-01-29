@@ -25,7 +25,7 @@ opt.nstep = 1e6; % number of steps to run
 % default (<0) means start uniformly
 opt.startpos = -1;
 % tolerance for "small time derivative"
-opt.dttol = 1e-4;
+opt.dttol = 1e-3;
 
 % displaying plots
 opt.dodisplay = 1;
@@ -82,9 +82,8 @@ ftc = 0; %flag for failing to converge. Is 1 when fails to converge.
 normdtg = inf;
 
 dtcutoff = opt.dttol;
-spacing = Lh/(opt.gpts-1); %integration spacing
-
-initglucint = spacing * trapz(gluc_init);
+spacing = dx;
+initglucint = dx * trapz(gluc_init);
 
 %% Iterative process
 %continues till steady state

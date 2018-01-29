@@ -13,7 +13,7 @@ options.gpts = 100;
 
 %% attempt to reproduce old results using new (paper) parameters
 
-options.nstep = 1e6;
+options.nstep = 1e6; 
 options.Km = 0.1;
 options.c0 = 0.1;
 options.kw = 1;
@@ -23,6 +23,7 @@ options.kg=1;
 options.dodisplay=0;
 options.showevery=100;
 options.nmito=75;
+options.dttol = 1e-3;
 
 options.delt = 0.05;
 options.gpts = 100;
