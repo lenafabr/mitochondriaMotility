@@ -1,4 +1,3 @@
-function [gluc,Tmito,Smito,Smito_int,normdtg,gluc_init,opt,xpos,lmdh,ftc] = permeablesims(options)
 %% set up default simulation parameters
 opt = struct();
 
@@ -20,7 +19,7 @@ opt.startgluc = [];
 opt.nmito = 75; % number of mitochondria
 opt.gpts = 100; % number of discrete spatial points for evaluating gluc concentration
 opt.delt = 1e-5; % time-step
-opt.nstep = 1e7; % number of steps to run
+opt.nstep = 1e8; % number of steps to run
 
 opt.P = 0.1; %permeability
 opt.f = opt.nmito * opt.msize / opt.L;
@@ -28,7 +27,7 @@ opt.f = opt.nmito * opt.msize / opt.L;
 opt.dttol = 1e-3;
 
 % displaying plots
-opt.dodisplay = 1;
+opt.dodisplay = 0;
 opt.showevery = 1;
 
 opt.restart = 1; % flag to enable continuing previous sims
@@ -51,8 +50,8 @@ kgh = opt.kg*tscale;
 c0h = opt.c0/cscale;
 msizeh = opt.msize/lscale;
 Ph = opt.P * tscale;
-delth = opt.delt/tscale;
 Kmh = opt.Km/cscale;
+delth = opt.delt/tscale;
 % spatial resolution
 dx = Lh/(opt.gpts - 1);
 
@@ -137,5 +136,4 @@ while (normdtg > dtcutoff)
         drawnow
     end
     gluc = gluc_new(2:end-1);
-end
 end

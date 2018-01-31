@@ -3,7 +3,7 @@
 %This is for the plot showing varying Tmito for c0, blue to red low c0 to
 %high c0, with analytical solution shown 
 lambda_hat = 0.06;
-options.ks = 200;
+options.ks = 100;
 options.D = 140;
 c0_llim = -2;
 c0_ulim = 2;
@@ -53,5 +53,5 @@ end
 formatOut = 'yyyymmdd';
 date = datestr(datetime('today'),formatOut);
 %save workspace with today's date'
-filename = strcat('workspace_',date,'c0_ks_200');
+filename = strcat('workspace_',date,'c0_ks_100');
 save (filename);

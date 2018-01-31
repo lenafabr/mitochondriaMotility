@@ -1,12 +1,13 @@
-%% Run wrapper for run numeric sims for high ks
+%% Run wrapper for gstat sims for high ks
 
 %changing c0_hat = c0/Km
 %changing lambda_hat
 %nmito = 75
 
 % set up parameter values different from default
-lambda_hat = 0.06;
 options.D = 140;
+options.Km = 0.1;
+options.kg = 1;
 c0_llim = -2;
 c0_ulim = 2;
 nc0 = 102;
@@ -21,8 +22,8 @@ options.L = 500;
 
 options.dodisplay = 0;
 options.dttol = 1e-3;
-options.delt = 1e-3;
-options.nstep = 1e7;
+options.delt = 1e-6;
+options.nstep = 1e9;
 
 
 %run the function
@@ -48,7 +49,7 @@ for i = 1:1:nl
         Gstat_all(:,i,j) = Gstat;
         Tmito_all(:,i,j) = Tmito;
         var_mito(i,j) = var(xpos,Tmito) ; %variance in mitochondria position distribution;
-        varmetric(i,j) = 6*var_mito(i,j)/options.L^2 - 0.5;
+        varmetric(i,j) = 6*var_mito(i,j) - 0.5; %Lh = 1
         
     end
     percent_completed_highks = (i/nl) * 100

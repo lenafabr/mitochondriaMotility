@@ -1,9 +1,8 @@
-function [gluc,Tmito,Smito,Smito_int,normdtg,gluc_init,opt,xpos,lmdh,ftc] = runiterativesims(options)
 %% set up default simulation parameters
 opt = struct();
 
 opt.kg = 1; % rate of glucose consumption
-opt.c0 = 0.01; % fixed glucose concentration
+opt.c0 = 0.1; % fixed glucose concentration
 opt.msize = 1; % mitochondria size
 
 opt.L = 500; % domain size
@@ -37,7 +36,6 @@ opt.restart = 1; % flag to enable continuing previous sims
 if (exist('options')==1)
     opt = copyStruct(options, opt);
 end
-opt.f = opt.nmito * opt.msize / opt.L;
 % set up dimensionless parameters
 %Nondimensionalize by L, L^2/D and Km
 tscale = (opt.L)^2 / opt.D;
@@ -59,7 +57,6 @@ dx = Lh/(opt.gpts - 1);
 %% Initialize start glucose concentration with analytical solution
 %Analytical solution obtained by assuming uniform distribution of
 %mitochondria
-
 % spatial positions at which glucose is evaluated
 % index 1 = point on domain edge
 xpos = linspace(0,Lh,opt.gpts)';
@@ -82,34 +79,28 @@ ftc = 0; %flag for failing to converge. Is 1 when fails to converge.
 normdtg = inf;
 
 dtcutoff = opt.dttol;
-%spacing = dx;
-%initglucint = dx * trapz(gluc_init);
 
-%% Iterative process
-%continues till steady state
-%steady state condition set by time derivative being small enough
+%% Solve the DE w/o using inbuilt function
+% so that we can set our own tolerance values
 step = 0;
 while (normdtg > dtcutoff)
     
     %Calculate distribution of total number of mitochondria
-    ksx = ksh * Kmh * gluc ./ (Kmh + gluc);
-    %ksx_int = spacing * trapz(ksx);
-    ksx_int = dx/2 * (ksx(1) + ksx(end) + 2*sum(ksx(2:end-1)));
-    Tmito = (ksx/kwh + 1) ./ (Lh + (ksx_int/kwh));
-    Smito = (ksx/kwh) ./ (Lh + (ksx_int/kwh));
-    %Smito_int = spacing * trapz(Smito);
-    Smito_int = dx/2 * (Smito(1) + Smito(end) + 2*sum(Smito(2:end-1)));
-    
-    %Calculate the change in glucose concentration
+    integrand =  Kmh * gluc ./ (Kmh + gluc);
+    integ = dx/2 * (integrand(1) + integrand(end) + 2*sum(integrand(2:end-1)));
+    Tmito = (Kmh * gluc ./ (Kmh + gluc))/ integ;
+
+   %Calculate the change in glucose concentration
     d2g(2:end-1) = (gluc(3:end)+gluc(1:end-2) - 2*gluc(2:end-1))/dx^2; %space double derivative
     % time derivative of glucose
-    dtg(2:end-1) = Dh*d2g(2:end-1) - (kgh * opt.nmito * msizeh) * (gluc(2:end-1) .* Tmito(2:end-1)) ./ (1 + gluc(2:end-1));
+    dtg(2:end-1) = Dh*d2g(2:end-1) - ((opt.nmito * msizeh * kgh /integ)  * (((Kmh * gluc(2:end-1)) ./ (Kmh + gluc(2:end-1))).^2));
     normdtg = norm(dtg);
     gluc = gluc+dtg*opt.delt;
+    
        
     if (any(gluc < -1e-3))
          disp('Concentration went negative. Try smaller timestep.')
-        ftc = 1;
+         ftc = 1;
         return
     end
     step = step+1;
@@ -121,17 +112,18 @@ while (normdtg > dtcutoff)
     end
     
     if (opt.dodisplay && mod(step,opt.showevery)==0)
-        
+        var_mito= var(xpos,Tmito) ; %variance in mitochondria position distribution;
+        varmetric = 6*var_mito/options.L^2 - 0.5;
+
         plot(xpos,gluc_init,'k--')
         hold all
         plot(xpos,gluc,'b.-')        
-        plot(xpos,Tmito*100,'r.-')
+        plot(xpos,Tmito*Lh/2,'r.-')
         hold off
-        legend('orig','gluc','mito')
-        title(sprintf('Norm dg/dt: %f',normdtg))
+        title(sprintf('Step %d, dtg: %f, varmetric: %f',step,normdtg,varmetric))
         drawnow
     end
+    Gstat = gluc;
+    ksx_stat = (ksh * Kmh * Gstat) ./ (Kmh + Gstat);
+    
 end
-
-end
-

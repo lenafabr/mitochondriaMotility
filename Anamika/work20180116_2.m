@@ -8,7 +8,7 @@
 % set up parameter values different from default
 options.D = 140;
 options.Km = 0.1;
-c0_llim = -3;
+c0_llim = -3.5;
 c0_ulim = 2;
 nc0 = 102;
 lh_llim = -2;
@@ -21,9 +21,9 @@ options.gpts = 100;
 options.L = 500;
 
 options.dodisplay = 0;
-options.dttol = 1e-3;
+options.dttol = 1e-2;
 options.delt = 1e-5;
-options.nstep = 1e6;
+options.nstep = 1e7;
 
 %run the function
 %change lambda hat at every iteration, thereby changing kg
@@ -34,8 +34,8 @@ lhlist = logspace(lh_llim,lh_ulim,nlh);
 kslist = {1,10,100,1e4};
 nks = 4;
 
-Gstat_all = zeros(options.gpts,nc0,nlh,3);
-Tmito_all = zeros(options.gpts,nc0,nlh,3);
+Gstat_all = zeros(options.gpts,nc0,nlh,4);
+Tmito_all = zeros(options.gpts,nc0,nlh,4);
 
 for k = 1:1:nks
     options.ks = kslist{k};
@@ -46,16 +46,16 @@ for k = 1:1:nks
             options.c0 = c0list(j);
             options.cend = options.c0;
             [gluc,Tmito,Smito,Smito_int,normdtg,gluc_init,opt,xpos,lmdh,ftc] = runiterativesims(options);
-            normdtg_matrix(i,j) = normdtg;
-            ftc_matric(i,j) = ftc;
-            option_list(i,j) = opt;
-            gluc_init_all(:,i,j) = gluc_init;
-            gluc_all(:,i,j) = gluc;
-            Tmito_all(:,i,j) = Tmito;
-            Smito_int_all(:,i,j) = Smito_int;
-            Smito_all(:,i,j) = Smito;
-            var_mito(i,j) = var(xpos,Tmito) ; %variance in mitochondria position distribution;
-            varmetric(i,j) = 6*var_mito(i,j)/options.L^2 - 0.5;
+            normdtg_matrix(i,j,k) = normdtg;
+            ftc_matric(i,j,k) = ftc;
+            option_list(i,j,k) = opt;
+            gluc_init_all(:,i,j,k) = gluc_init;
+            gluc_all(:,i,j,k) = gluc;
+            Tmito_all(:,i,j,k) = Tmito;
+            Smito_int_all(:,i,j,k) = Smito_int;
+            Smito_all(:,i,j,k) = Smito;
+            var_mito(i,j,k) = var(xpos,Tmito) ; %variance in mitochondria position distribution;
+            varmetric(i,j,k) = 6*var_mito(i,j)- 0.5;
         end
         percent_completed = (i/nlh * 100) * (k/nks)
     end

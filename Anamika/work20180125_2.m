@@ -60,8 +60,8 @@ save (filename);
 %% to plot figure 2 (Tmito for various c0) and the analytical soln
 clear
 % First plot Tmito from simulations
-load('workspace_20180125c0_ks_100.mat')
-T = [0,0,0.5;1,0,0];
+load('workspace_20180130c0_ks_100.mat')
+T = [0,0,0.25;1,0,0];
 x = [0;20];
 cmap = interp1(x/20,T,linspace(0,1,20));
 for c = 1:2:20
@@ -73,10 +73,11 @@ c0 = 0.01; % 10 times lower than options.Km. Gives the extreme limit
 options.kw = 1;
 c0h = c0/options.Km;
 ksh = options.ks * options.Km * (options.L)^2 / options.D;
+Kmh = options.Km/options.Km;
 Lh = 1;
 gluc_calc = c0h * cosh((xpos-Lh/2)./(Lh * lmdh)) ./ cosh(0.5/lmdh);
 dx = Lh/(options.gpts - 1);
-ksx = ksh * options.Km * gluc_calc ./ (options.Km + gluc_calc);
+ksx = ksh * Kmh * gluc_calc ./ (Kmh + gluc_calc);
 ksx_int = dx * trapz(ksx);
 kwh = options.kw * (options.L)^2 / options.D;
 Tmito_calc = (ksx/kwh + 1) ./ (Lh + (ksx_int/kwh));

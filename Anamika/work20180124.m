@@ -22,8 +22,8 @@ options.L = 500;
 options.ks = 200;
 
 options.dodisplay = 0;
-options.dttol = 1e-3;
-options.delt = 2*1e-4;
+options.dttol = 1e-2;
+options.delt = 5*1e-5;
 options.nstep = 1e8;
 
 %run the function
