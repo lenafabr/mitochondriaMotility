@@ -1,5 +1,5 @@
 %% Run wrapper for changing c0 and lambda_hat
-%ks fixed at 1, 10, 100, 1e4
+%ks fixed at 20,50,1000
 %Km = 0.1
 %changing c0_hat = c0/Km
 %changing lambda_hat
@@ -31,14 +31,14 @@ options.nstep = 1e7;
 
 c0list = logspace(c0_llim,c0_ulim,nc0);
 lhlist = logspace(lh_llim,lh_ulim,nlh);
-kslist = [1,10,100,1e4];
-nks = 4;
+kslist = [20,50,1000];
+nks = 3;
 
-Gstat_all = zeros(options.gpts,nc0,nlh,4);
-Tmito_all = zeros(options.gpts,nc0,nlh,4);
+Gstat_all = zeros(options.gpts,nc0,nlh,nks);
+Tmito_all = zeros(options.gpts,nc0,nlh,nks);
 
 for k = 1:1:nks
-    options.ks = kslist{k};
+    options.ks = kslist(k);
     for i = 1:1:nlh
         lambda_hat = lhlist(i);
         options.kg = options.D ./ (options.nmito * options.msize * options.L * (lambda_hat^2));
@@ -64,5 +64,5 @@ end
 formatOut = 'yyyymmdd';
 date = datestr(datetime('today'),formatOut);
 %save workspace with today's date'
-filename = strcat('workspace_',date,'lhc0_ks_1_10_100_1e4_Km0_1');
+filename = strcat('workspace_',date,'lhc0_ks_20_50_1000_Km0_1');
 save (filename);
