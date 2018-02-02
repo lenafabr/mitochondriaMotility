@@ -5,24 +5,24 @@
 load('workspace_20180131lhc0_ks_1_10_100_1e4_Km0_1.mat'); %made using work20180116_2
 figure;
 varmetric = 6*var_mito- 0.5; %Lh = 1;
+ksind = 4;
 colormap jet;
-pcolor(log10(c0list),log10(lhlist),varmetric(:,:,4)); shading flat
+pcolor(log10(c0list),log10(lhlist),varmetric(:,:,ksind)); shading flat
 xlabel('log10(c0)')
 ylabel('log10(\lambda)')
-title(sprintf('Variance Metric Plot for k_s = 10000'));
+title(sprintf('Variance Metric Plot for k_s = %k',kslist(ksind)));
 
 %% get surface plot from a different set of data
 %load ks = {20,50,1000} data
 %seems that ks = 1,10 are too small
-
-load('workspace_20180131lhc0_ks_1_10_100_1e4_Km0_1.mat');
+load('workspace_20180201lhc0_ks_20_50_1000_Km0_1.mat')
 varmetric = 6*var_mito- 0.5; %Lh = 1;
 colormap jet;
-ksind = 2;
+ksind = 3;
 pcolor(log10(c0list),log10(lhlist),varmetric(:,:,ksind)); shading flat
 xlabel('log10(c0)')
 ylabel('log10(\lambda)')
-title(sprintf('Variance Metric Plot for k_s =%',kslist(ksind)));
+title(sprintf('Variance Metric Plot for k_s = %d',kslist(ksind)));
 
 %% look at conc necessary to achieve variance cutoff 
 
@@ -50,11 +50,12 @@ for k = 1:1:nks
             c0cutoffL(i,k) = interp1(varmetric(i,1:I,k),c0vals(1:I),cutoff);
         end
     end
+    cmap = [0,0,1;0.7,0,0.5;1,0,0];
     
     
     % plot
     %ll = logspace(-2,-1);
-    loglog(lhlist,c0cutoffU(:,k),'r',lhlist,c0cutoffL(:,k), 'r','LineWidth',2)%,ll,1./ll.^3,ll,50./ll.^2,ll,30./ll)
+    loglog(lhlist,c0cutoffU(:,k),lhlist,c0cutoffL(:,k),'Color',cmap(k,:),'LineWidth',2)%,ll,1./ll.^3,ll,50./ll.^2,ll,30./ll)
     xlim([1e-2,1])
     hold on;
 end

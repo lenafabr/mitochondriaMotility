@@ -6,7 +6,7 @@
 load('workspace_20180119discretesims_100itr');
 %% concatenate mitopos_dis to one long array
 mitodis = reshape(mitopos_dis,[1,size(mitopos_dis,1)*size(mitopos_dis,2)]);
-hist_mito = histogram(mitodis,30,'Normalization','pdf');
+hist_mito = histogram(mitodis,40,'Normalization','pdf');
 %hold on
 %histogram(mitodis,100,'Normalization','pdf');
 %hold off;
