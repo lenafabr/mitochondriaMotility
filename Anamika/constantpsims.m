@@ -17,7 +17,7 @@ opt.Km = 1;
 % default is to start linear
 opt.startgluc = [];
 
-opt.nmito = 70; % number of mitochondria
+opt.nmito = 75; % number of mitochondria
 opt.gpts = 100; % number of discrete spatial points for evaluating gluc concentration
 opt.delt = 1e-2; % time-step
 opt.nstep = 1e5; % number of steps to run
@@ -28,8 +28,6 @@ opt.c0 = 1;
 opt.cend = 0.1; 
 %Permeability term
 opt.P = 0.1;
-opt.f = opt.nmito * opt.msize / opt.L;
-
 % tolerance for "small time derivative"
 opt.dttol = 1e-4;
 
@@ -48,21 +46,14 @@ end
 tscale = (opt.L)^2 / opt.D;
 lscale = opt.L;
 cscale = opt.Km;
-Lh = opt.L/opt.msize;
 Lh = opt.L/lscale;
-velh = 1;
-velh = opt.vel*tscale/lscale;
-kwh = opt.kw/opt.vel*opt.msize;
 kwh = opt.kw*tscale;
-ksh = opt.ks/opt.vel*opt.Km*opt.msize;
 ksh = opt.ks*cscale*tscale; %verify
-Dh = opt.D/opt.msize/opt.vel;
 Dh = opt.D*tscale/lscale^2;
-kgh = opt.kg*opt.msize/opt.vel;
 kgh = opt.kg*tscale;
-c0h = opt.c0/opt.Km;
+Kmh = opt.Km/cscale;
 c0h = opt.c0/cscale;
-Ph = opt.P * opt.msize / opt.vel;
+cendh = opt.cend/cscale;
 Ph = opt.P * tscale;
 % spatial resolution
 dx = Lh/(opt.gpts - 1);
@@ -84,9 +75,8 @@ C_out = ((cendh - c0h) * (xpos - Lh/2) / Lh) + (cendh + c0h)/2;
 
 ftc = 0; %flag for failing to converge. Is 1 when fails to converge. 
 normdtg = inf;
-dtcutoff = opt.dttol*(kgh*opt.Km/(opt.Km+1));
-spacing = Lh/opt.gpts; %integration spacing
-initglucint = spacing * trapz(gluc_init);
+dtcutoff = opt.dttol;
+initglucint = dx * trapz(gluc_init);
 
 %% Iterative process
 %continues till steady state
@@ -94,16 +84,16 @@ initglucint = spacing * trapz(gluc_init);
 step = 0;
 while (normdtg > dtcutoff)
     %Calculate distribution of total number of mitochondria
-    ksx = ksh * opt.Km * gluc ./ (opt.Km + gluc);
-    ksx_int = spacing * trapz(ksx);
+    ksx = ksh * Kmh * gluc ./ (Kmh + gluc);
+    ksx_int = dx * trapz(ksx);
     Tmito = (ksx/kwh + 1) ./ (Lh + (ksx_int/kwh));
     Smito = (ksx/kwh) ./ (Lh + (ksx_int/kwh));
-    Smito_int = spacing * trapz(Smito);
+    Smito_int = dx * trapz(Smito);
     
     %Calculate the change in glucose concentration
     d2g(2:end-1) = (gluc(3:end)+gluc(1:end-2) - 2*gluc(2:end-1))/dx^2; %space double derivative
     % time derivative of glucose
-    dtg(2:end-1) = Dh*d2g(2:end-1) - (kgh * opt.Km * opt.nmito * opt.msize) * (gluc(2:end-1) .* Tmito(2:end-1)) ./ (opt.Km + gluc(2:end-1)) + (Ph*(C_out(2:end-1) - gluc(2:end-1)));
+    dtg(2:end-1) = Dh*d2g(2:end-1) - (kgh * Kmh * opt.nmito * opt.msize) * (gluc(2:end-1) .* Tmito(2:end-1)) ./ (Kmh + gluc(2:end-1)) + (Ph*(C_out(2:end-1) - gluc(2:end-1)));
     normdtg = norm(dtg);
     gluc = gluc+dtg*opt.delt;
     %implement reflecting boundary condition - is this implementation
