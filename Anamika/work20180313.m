@@ -5,7 +5,7 @@ options.msize = 1; % mitochondria size
 options.L = 500; % domain size
 options.D = 140;% glucose diffusion coefficient
 options.kw = 1; % rate of starting a walk
-options.ks = 1; % rate of stopping is ks*[gluc]
+options.ks = 1e3; % rate of stopping is ks*[gluc]
 
 
 options.delt = 1e-5; % time-step
@@ -36,4 +36,3 @@ plot(xpos,gluc_calc,'b');
 hold off
 
 %% Then plug in values from the dataset in the exptl paper
-
