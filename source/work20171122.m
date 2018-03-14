@@ -41,7 +41,7 @@ plot(xpos,Tmito_all(:,1,66),xpos,1/500*ones(size(xpos)),'--')
 %% compare distributions across boundary
 cmap = colormapinterp([0,0,1;1,0,0],43);
 for c = 1:43
-plot(xpos,Tmito_all(:,c),'Color',cmap(c))
+plot(xpos,Tmito_all(:,39,c),'Color',cmap(c,:))
 hold all
 end
 
