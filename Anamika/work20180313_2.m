@@ -18,19 +18,19 @@ options.c0 = 50; %Using exptl paper
 options.cend = 0.1; %Exptl
 % tolerance for "small time derivative"
 options.dttol = 1e-2;
-options.nstep = 1e8;
-options.delt = 1e-6;
+options.nstep = 1e9;
+options.delt = 1e-8;
 % displaying plots
 options.dodisplay = 0;
 options.showevery = 100;
 
 %% run wrapper with varying P and lambda_hat
-lh_ulim = -2;
-lh_llim = 2;
+lh_llim = -2;
+lh_ulim = 0;
 P_ulim = 3;
 P_llim = -3;
-nlh = 11;
-nP = 12;
+nlh = 101;
+nP = 102;
 lhlist = logspace(lh_llim,lh_ulim,nlh);
 Plist = logspace(P_llim,P_ulim,nP);
 for i = 1:1:nlh
